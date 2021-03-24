@@ -53,7 +53,7 @@ class Admin:
         frame_button = Frame(top_level, background='#cedfe0')
         frame_button.pack(side=TOP, fill=X)
         self.frame_tabel = Frame(top_level)
-        self.frame_tabel.pack(side=TOP, fill=Y, expand=YES)
+        self.frame_tabel.pack(side=TOP, fill=Y, expand=YES, padx=10, pady=10)
 
         #input frame_label
         Label(input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Kode').grid(column='0', padx='30', pady='10', row='0', sticky='w')
@@ -80,20 +80,19 @@ class Admin:
         #button frame
         Button(frame_button, command=self.onSave, font='{Arial} 10 {}', relief='groove', text='Simpan', width='8').grid(column='0', padx='15', pady='20', row='0', sticky='w')
         Button(frame_button, font='{Segoe UI Semibold} 10 {}', relief='groove', state='disabled', text='Update', width='8').grid(column='1', padx='15', pady='20', row='0', sticky='w')
-        Button(frame_button, )
+        self.deleteButton = Button(frame_button, command=self.onDelete, font='{Arial} 10 {}', relief='groove', text='Hapus', width='8')
+        self.deleteButton.grid(column='2', row='0', padx='15', pady='20', sticky='w' )
 
         #tabel
         self.trvTabel = ttk.Treeview(self.frame_tabel, columns=judul_kolom, show='headings')
         self.trvTabel.bind("<Double-1>")
         sbVer = Scrollbar(self.frame_tabel, orient='vertical', command=self.trvTabel.yview)
         sbVer.pack(side=RIGHT, fill=BOTH)
-        self.trvTabel.pack(side=TOP, fill=BOTH)
+        self.trvTabel.pack(side=TOP, fill=BOTH, padx=10, pady=10)
         self.trvTabel.configure(yscrollcommand=sbVer.set)
         self.table()
 
     def onSave(self):
-
-
         entNama = self.inputNama.get()
         entUsername = self.inputUsername.get()
         entPassword = self.inputPassword.get()
@@ -104,9 +103,14 @@ class Admin:
         self.trvTabel.delete(*self.trvTabel.get_children())
         self.frame_tabel.after(0, self.table())
 
+    def onDelete(self):
+        selected_item = self.trvTabel.selection()[0]
+        get_id = self.trvTabel.item(selected_item)['values'][0]
+        config.delete(get_id)
+        self.trvTabel.delete(*self.trvTabel.get_children())
+        self.frame_tabel.after(0, self.table())
 
     def table(self):
-
         for kolom in judul_kolom:
             self.trvTabel.heading(kolom, text=kolom)
 
@@ -120,8 +124,11 @@ class Admin:
         result = config.read()
         i=0
         for data in result:
-            self.trvTabel.insert('', 'end', values=data)
+            baris = "genap" if i%2 == 0 else "ganjil"
+            self.trvTabel.insert('', 'end', values=data, tags=(baris, ))
             i+=1
+        self.trvTabel.tag_configure("ganjil", background="#FFFFFF")
+        self.trvTabel.tag_configure("genap", background="whitesmoke")
 
 
 

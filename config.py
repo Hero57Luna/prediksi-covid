@@ -40,10 +40,10 @@ class Config:
         self.__db
         val = self.id = id
         cur = self.__db.cursor()
-        sql = "DELETE FROM user WHERE id = %s", val
-        cur.execute(sql)
-        cur.close()
-        self.__db.close()
+        sql = "DELETE FROM user WHERE id = %s"
+        cur.execute(sql, (val,))
+        self.__db.commit()
+
 
     def autoIncrement(self):
         db = mysql.connector.connect(
