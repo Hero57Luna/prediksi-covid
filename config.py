@@ -1,6 +1,6 @@
 import mysql.connector
 
-class Config:
+class Config(object):
 
     def __init__(self):
         self.__host = "localhost"
@@ -18,6 +18,21 @@ class Config:
         )
         self.__db = db
 
+    def koneksiDB(self):
+        konek = {
+            "host": "localhost",
+            "user": "root",
+            "password": "",
+            "database": "sisfo-covid"
+        }
+
+        try:
+            c = mysql.connector.connect(**konek)
+            return c
+        except:
+            print("Sambungan gagal")
+            exit(1)
+
     def create(self, nama, username, password, role, departement):
 
         self.nama = nama
@@ -30,11 +45,24 @@ class Config:
         cursor.execute("INSERT INTO user (nama, username, password, role, departement) VALUES (%s, %s, %s, %s, %s)", val)
         self.__db.commit()
 
+
     def read(self):
         cur = self.__db.cursor()
         cur.execute("SELECT * FROM user")
         data_user = cur.fetchall()
         return data_user
+
+    def update(self, nama, username, role, departement, kode):
+        # self.nama = nama
+        # self.username = username
+        # self.role = role
+        # self.departement = departement
+
+        cursor = self.__db.cursor()
+        val = (nama, username, role, departement, kode)
+        sql = "UPDATE user SET nama=%s, username=%s, role=%s, departement=%s WHERE id=%s"
+        cursor.execute(sql,(val))
+        self.__db.commit()
 
     def delete(self, id):
         self.__db

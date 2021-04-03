@@ -1,33 +1,11 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from config import Config
-import mysql.connector
-
 
 root = Tk()
 root.title("Halaman Admin")
+root.resizable(0, 0)
 config = Config()
-
-class DraggableWindow():
-    def __init__(self, label):
-        self.label = label
-        label.bind('<ButtonPress-1>', self.StartMove)
-        label.bind('<ButtonPress-1>', self.StopMove)
-        label.bind('<B1-Motion>', self.OnMotion)
-
-    def StartMove(self, event):
-        self.x = event.x
-        self.y = event.y
-
-    def StopMove(self):
-        self.x = None
-        self.y = None
-
-    def OnMotion(self, event):
-        x = (event.x_root - self.x - self.label.winfo_rootx() + self.label.winfo_rootx())
-        y = (event.y_root - self.y - self.label.winfo_rooty() + self.label.winfo_rooty())
-        root.geometry("+%s+%s" % (x, y))
-
 judul_kolom = ("ID", "Nama", "Username", "Password", "Role", "Departement")
 
 class Admin:
@@ -64,7 +42,9 @@ class Admin:
         Label(input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Departement').grid(column='0', padx='30', pady='10', row='5', sticky='w')
 
         #input frame entry
-        self.inputKode = Entry(input_frame, width='20', state='readonly')
+        readonlytext = StringVar()
+        self.inputKode = Entry(input_frame, width='25', state='readonly', textvariable=readonlytext)
+        readonlytext.set('Dikembangkan Otomatis')
         self.inputKode.grid(column='1', padx='20', row='0', sticky='w')
         self.inputNama = Entry(input_frame, width='50')
         self.inputNama.grid(column='1', padx='20', row='1', sticky='w')
@@ -78,14 +58,14 @@ class Admin:
         self.inputDepartement.grid(column='1', padx='20', row='5', sticky='w')
 
         #button frame
-        Button(frame_button, command=self.onSave, font='{Arial} 10 {}', relief='groove', text='Simpan', width='8').grid(column='0', padx='15', pady='20', row='0', sticky='w')
-        Button(frame_button, font='{Segoe UI Semibold} 10 {}', relief='groove', state='disabled', text='Update', width='8').grid(column='1', padx='15', pady='20', row='0', sticky='w')
-        self.deleteButton = Button(frame_button, command=self.onDelete, font='{Arial} 10 {}', relief='groove', text='Hapus', width='8')
-        self.deleteButton.grid(column='2', row='0', padx='15', pady='20', sticky='w' )
+        Button(frame_button, command=self.onSave, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Simpan', width='8').grid(column='0', padx='30', pady='20', row='0', sticky='w')
+        Button(frame_button, font='{Segoe UI Semibold} 10 {}', relief='groove', state='normal', text='Update', width='8', command=self.onUpdate).grid(column='1', padx='30', pady='20', row='0', sticky='w')
+        self.deleteButton = Button(frame_button, command=self.onDelete, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8')
+        self.deleteButton.grid(column='2', row='0', padx='30', pady='20', sticky='w' )
 
         #tabel
         self.trvTabel = ttk.Treeview(self.frame_tabel, columns=judul_kolom, show='headings')
-        self.trvTabel.bind("<Double-1>")
+        self.trvTabel.bind("<Double-1>", self.onDoubleClick)
         sbVer = Scrollbar(self.frame_tabel, orient='vertical', command=self.trvTabel.yview)
         sbVer.pack(side=RIGHT, fill=BOTH)
         self.trvTabel.pack(side=TOP, fill=BOTH, padx=10, pady=10)
@@ -110,6 +90,17 @@ class Admin:
         self.trvTabel.delete(*self.trvTabel.get_children())
         self.frame_tabel.after(0, self.table())
 
+    def onUpdate(self):
+        kode = self.inputKode.get()
+        nama = self.inputNama.get()
+        username = self.inputUsername.get()
+        role = self.inputRole.get()
+        departement = self.inputDepartement.get()
+
+        config.update(nama, username, role, departement, kode)
+        self.trvTabel.delete(*self.trvTabel.get_children())
+        self.frame_tabel.after(0, self.table())
+
     def table(self):
         for kolom in judul_kolom:
             self.trvTabel.heading(kolom, text=kolom)
@@ -129,6 +120,28 @@ class Admin:
             i+=1
         self.trvTabel.tag_configure("ganjil", background="#FFFFFF")
         self.trvTabel.tag_configure("genap", background="whitesmoke")
+
+    def onDoubleClick(self, event):
+        self.inputKode.config(state="normal")
+        self.inputKode.delete(0, END)
+        self.inputNama.delete(0, END)
+        self.inputUsername.delete(0, END)
+        self.inputPassword.delete(0, END)
+        self.inputRole.delete(0, END)
+        self.inputDepartement.delete(0, END)
+
+        selected = self.trvTabel.focus()
+        item = self.trvTabel.item(selected, "values")
+
+        self.inputKode.insert(END, item[0])
+        self.inputKode.config(state="readonly")
+        self.inputNama.insert(END, item[1])
+        self.inputUsername.insert(END, item[2])
+        self.inputPassword.insert(END, item[3])
+        self.inputRole.insert(END, item[4])
+        self.inputDepartement.insert(END, item[5])
+
+
 
 
 
