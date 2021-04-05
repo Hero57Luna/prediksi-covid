@@ -53,11 +53,6 @@ class Config(object):
         return data_user
 
     def update(self, nama, username, role, departement, kode):
-        # self.nama = nama
-        # self.username = username
-        # self.role = role
-        # self.departement = departement
-
         cursor = self.__db.cursor()
         val = (nama, username, role, departement, kode)
         sql = "UPDATE user SET nama=%s, username=%s, role=%s, departement=%s WHERE id=%s"

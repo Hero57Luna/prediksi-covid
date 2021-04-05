@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from config import Config
 
 root = Tk()
@@ -58,13 +59,17 @@ class Login(Config):
         if results:
 
             for i in results:
-                print("Logged in!")
+                print("")
                 root.destroy()
-                import admin
+                import halaman_utama_admin
                 break
 
         else:
-            print("Gagal!")
+            messagebox.showerror(title='Error', message='Username atau Password salah')
+
+    def currentUser(self):
+        username = self.inputUsername.get()
+        return username
 
 
 Login(root)
