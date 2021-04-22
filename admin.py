@@ -142,5 +142,6 @@ class Admin:
         self.inputDepartement.insert(END, item[5])
 
 
+
 Admin(root)
 root.mainloop()

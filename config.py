@@ -105,3 +105,5 @@ class Config(object):
             hit = "0001"
             self.inputKode.insert(0, hit)
             self.inputNama.focus_set()
+
+import login
