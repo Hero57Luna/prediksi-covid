@@ -38,6 +38,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\halaman_input_positif.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\halaman_utama_admin.py">
           <value>
             <Attribute>

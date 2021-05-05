@@ -1,10 +1,12 @@
 from tkinter import *
 from tkinter import messagebox
 from config import Config
+import os
 
 root = Tk()
-root.title("Halaman Login")
+root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
+root.iconbitmap("Polinema.ico")
 
 class Login(Config):
     def __init__(self, toplevel):
@@ -58,11 +60,10 @@ class Login(Config):
         results = cursor.fetchall()
         if results:
 
-            for i in results:
-                print("")
-                root.destroy()
-                import halaman_utama_admin
-                break
+            # for i in results:
+            root.destroy()
+            os.system('python halaman_utama_admin.py')
+
 
         else:
             messagebox.showerror(title='Error', message='Username atau Password salah')

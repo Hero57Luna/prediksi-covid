@@ -1,9 +1,10 @@
 from tkinter import *
+import os
 
 root = Tk()
-root.title('Halaman Utama Admin')
+root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
-
+root.iconbitmap("Polinema.ico")
 
 class UtamaAdmin:
     def __init__(self, toplevel):
@@ -21,7 +22,7 @@ class UtamaAdmin:
         self.top_level.pack(side='top', fill='both', expand='true')
         self.header_frame = Frame(self.top_level, background='#808080', padx='10', pady='20')
         self.header_frame.pack(side='top', fill='x', anchor='center')
-        self.button_frame = Frame(self.top_level, background='#cedfe0', pady='50')
+        self.button_frame = Frame(self.top_level, background='#cedfe0', pady='10')
         self.button_frame.pack(side='top')
 
         #label
@@ -29,17 +30,23 @@ class UtamaAdmin:
 
         #button
         self.buttonKelola = Button(self.button_frame, text='Kelolah Pengguna', width='30', font='{Segoe UI Semibold} 12 {}', command=self.KelolaPengguna)
-        self.buttonKelola.grid(column='0', row='0', pady='50')
-        self.buttonInputData = Button(self.button_frame, text='Input Data Kasus Positif', width='30', font='{Segoe UI Semibold} 12 {}')
-        self.buttonInputData.grid(column='0', row='1', pady='50')
+        self.buttonKelola.grid(column='0', row='0', pady='30')
+        self.buttonInputData = Button(self.button_frame, text='Input Data Kasus Positif', width='30', font='{Segoe UI Semibold} 12 {}', command=self.InputDataPositif)
+        self.buttonInputData.grid(column='0', row='1', pady='30')
+        self.buttonPrediksi = Button(self.button_frame, text='Lakukan Prediksi Data', width='30', font='{Segoe UI Semibold} 12 {}', command=self.PrediksiData)
+        self.buttonPrediksi.grid(column='0', row='2', pady='30')
 
     def KelolaPengguna(self):
         root.destroy()
-        import admin
+        os.system('python admin.py')
 
     def InputDataPositif(self):
-        pass
+        root.destroy()
+        os.system('python halaman_input_positif.py')
 
+    def PrediksiData(self):
+        root.destroy()
+        os.system('python peramalan.py')
 
 UtamaAdmin(root)
 root.mainloop()
