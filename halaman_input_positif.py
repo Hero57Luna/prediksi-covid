@@ -54,31 +54,37 @@ class InputPositif(Config):
     def onSave(self):
         entTanggal = self.entryTanggal.get()
         entKasus = self.entryKasus.get()
-
         #konversi tanggal dan kasus
         tanggalString = str(entTanggal)
-        kasusInt = int(entKasus)
-
         format = "%Y-%m-%d"
 
-        try:
-            datetime.datetime.strptime(tanggalString, format)
-            self.insertKasus(entTanggal, entKasus)
-            self.onClear()
-        except ValueError:
-            messagebox.showerror(title='Error', message='Format tanggal salah!')
+        if len(entTanggal or entKasus) > 0 :
+            if len(entTanggal) > 0 :
+                if len(entKasus) > 0 :
+                    try:
+                        datetime.datetime.strptime(tanggalString, format)
+                        if isinstance(entKasus, int) == TRUE:
+                            self.insertKasus(entTanggal, entKasus)
+                            self.onClear()
+                            messagebox.showinfo(title='Sukses', message='Data berhasil dimasukkan')
+                        else:
+                            messagebox.showerror(title='Error', message='Kasus harus angka')
+                    except ValueError:
+                        messagebox.showerror(title='Error', message='Format tanggal salah!')
+                else:
+                    messagebox.showerror(title='Error',message='Kasus tidak boleh kosong')
+            else:
+                messagebox.showerror(title='Error', message='Tanggal tidak boleh kosong')
+        else:
+            messagebox.showerror(title='Error', message='Field tidak boleh kosong')
 
     def onClear(self):
         self.entryTanggal.delete(0, END)
         self.entryKasus.delete(0, END)
 
-
     def onKembali(self):
         root.destroy()
         os.system('python halaman_utama_admin.py')
-
-
-
 
 InputPositif(root)
 root.mainloop()

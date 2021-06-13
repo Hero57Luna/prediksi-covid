@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+from pathlib import Path
 
 class Config(object):
 
@@ -30,12 +31,11 @@ class Config(object):
         try:
             c = mysql.connector.connect(**konek)
             return c
-        except:
+        except mysql.connector.errors.InterfaceError:
             print("Sambungan gagal")
             exit(1)
 
     def create(self, nama, username, password, bagian):
-
         self.nama = nama
         self.username = username
         self.password = password
@@ -50,7 +50,7 @@ class Config(object):
         self.jumlah = jumlah
         cursor = self.__db.cursor()
         value = (tanggal, jumlah)
-        cursor.execute("INSERT INTO kasus (tanggal, kasus) VALUES (%s, %s)", value)
+        cursor.execute("INSERT INTO kasus_probolinggo (Tanggal, Kasus) VALUES (%s, %s)", value)
         self.__db.commit()
 
 
@@ -74,13 +74,57 @@ class Config(object):
         cur.execute(sql, (val,))
         self.__db.commit()
 
-    def GenerateCSV(self):
-        cwd = os.getcwd()
-        dir = 'D:'
-        namaFile = "\Positif.csv"
-        query = "(SELECT 'Tanggal','Kasus') UNION (SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), Kasus FROM kasus INTO OUTFILE '{}{}' FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n')".format(dir, namaFile)
+    def GenerateCSVDataReal(self):
+        #export untuk datareal
+        exported_path = Path('.').absolute() / 'exported' / 'Positif.csv'
+        target = '%r'%str(exported_path)
+
+        #export untuk data pre vaksin
+        exported_path_prevaksin = Path('.').absolute() / 'exported' / 'DataPreVaksin.csv'
+        target_prevaksin = '%r'%str(exported_path_prevaksin)
+
+        query = "SELECT 'Tanggal','Kasus' " \
+                "UNION " \
+                "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
+                "Kasus FROM datareal " \
+                "INTO OUTFILE {} " \
+                "FIELDS TERMINATED BY ',' " \
+                "LINES TERMINATED BY '\n' ;".format(target)
         cur = self.__db.cursor()
         cur.execute(query)
+
+    def GenerateCSVDataPreVaksin(self):
+        exported_path = Path('.').absolute() / 'exported' / 'DataPreVaksin.csv'
+        target = '%r'%str(exported_path)
+
+        query = "SELECT 'Tanggal','Kasus' " \
+                "UNION " \
+                "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
+                "Kasus FROM dataprevaksin " \
+                "INTO OUTFILE {} " \
+                "FIELDS TERMINATED BY ',' " \
+                "LINES TERMINATED BY '\n' ;".format(target)
+        cur = self.__db.cursor()
+        cur.execute(query)
+
+    def GenerateCSVDataPascaVaksin(self):
+        exported_path = Path('.').absolute() / 'exported' / 'DataPascaVaksin.csv'
+        target = '%r' % str(exported_path)
+
+        query = "SELECT 'Tanggal','Kasus' " \
+                "UNION " \
+                "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
+                "Kasus FROM datapascavaksin " \
+                "INTO OUTFILE {} " \
+                "FIELDS TERMINATED BY ',' " \
+                "LINES TERMINATED BY '\n' ;".format(target)
+        cur = self.__db.cursor()
+        cur.execute(query)
+
+    def GenerateAllData(self):
+        self.GenerateCSVDataReal()
+        self.GenerateCSVDataPreVaksin()
+        self.GenerateCSVDataPascaVaksin()
 
 if __name__ == '__main__':
     Config()

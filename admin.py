@@ -90,13 +90,16 @@ class Admin(Config):
         entKonfirmasi = self.inputKonfirmasi.get()
         entBagian = self.inputBagian.get()
 
-        if entPassword != entKonfirmasi :
-            messagebox.showwarning(title='Error', message='Konfirmasi password tidak sama!')
+        if len(entNama or entUsername or entPassword or entKonfirmasi or entBagian) > 0 :
+            if entPassword != entKonfirmasi :
+                messagebox.showwarning(title='Error', message='Konfirmasi password tidak sama!')
+            else:
+                self.create(entNama, entUsername, entPassword, entBagian)
+                self.trvTabel.delete(*self.trvTabel.get_children())
+                self.frame_tabel.after(0, self.table())
+                self.clear()
         else:
-            self.create(entNama, entUsername, entPassword, entBagian)
-            self.trvTabel.delete(*self.trvTabel.get_children())
-            self.frame_tabel.after(0, self.table())
-            self.clear()
+            messagebox.showerror(title='Error', message='Field harus lengkap')
 
     def onDelete(self):
         konfirmasi_hapus = messagebox.askquestion(title='Hapus data', message='Apakah Anda yakin ingin menghapus?', icon='warning')
