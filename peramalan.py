@@ -51,7 +51,7 @@ class Peramalan(Config):
         self.inputAkurasi = Entry(self.nilai_frame, state='readonly')
         self.inputAkurasi.grid(column='1', row='3')
 
-        Button(self.button_frame, command=self.single_exponential_smoothing,font='{Segoe UI Semibold} 10 {}', relief='groove', text='Generate Graph', width='20').grid(column='0', padx='10', row='0')
+        Button(self.button_frame, command=self.GenerateGraph,font='{Segoe UI Semibold} 10 {}', relief='groove', text='Generate Graph', width='20').grid(column='0', padx='10', row='0')
         self.buttonPreVaksin = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Prediksi Pre-Vaksin', width='20', command=self.PreVaksin)
         self.buttonPreVaksin.grid(column='0', row='1', padx='10')
         self.buttonGenerateCSV = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Generate CSV', width='20', command=self.onGenerateCSV)
@@ -68,58 +68,47 @@ class Peramalan(Config):
     def onGenerateCSV(self):
        self.GenerateAllData()
 
-    def single_exponential_smoothing(self):
+    def GenerateGraph(self):
+        np.set_printoptions(precision=3, suppress=True)
         cwd = os.getcwd()
         target_file = '\exported\Positif.csv'
         target_dir = cwd + target_file
         df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.1
+        alpha = 0.9
+        kasus = df['Kasus']
+        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
         hasil = []
-        error = []
-        t_plus_one_error = []
-        data_terakhir = df['Kasus'].tail(1)
-        baca_kasus = df['Kasus']
-        baca_tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
-        tanggal_to_array = np.array(baca_tanggal)
-        kasus_to_array = np.array(baca_kasus)
-        jumlah_hari = baca_tanggal.count()
+        jumlah_data = kasus.count()
 
+        for i, x in enumerate(kasus):
+            if i == 0:
+                res = x
+                hasil.append(x)
+            else:
+                tmp = alpha * x + (1 - alpha) * res
+                hasil.append(tmp)
+                res = tmp
 
-        for i in range(jumlah_hari):
-            kasus = baca_kasus.values[i]
-            t_plus_one = df['Kasus'].shift(1).values[i]
-            F_ke_n = (alpha * t_plus_one) + (1 - alpha) * kasus
-            hasil.append(F_ke_n)
-            t_plus_one_error.append(t_plus_one)
-            error.append(F_ke_n - t_plus_one)
+        final = np.array(hasil)
+        kasus_to_array = np.array(kasus)
 
+        #hitung mean error
+        forecast_error = np.delete(final, [-1])
+        kasus_error = np.delete(kasus_to_array, [0])
+        error = np.subtract(kasus_error, forecast_error)
+        mean_error = np.nansum(error)
 
-        mean_error = np.nansum(error)/jumlah_hari
+        #hitung mse
+        sum_error = np.nansum(error)
+        sum_total = np.nansum(kasus_to_array)
+        sum_total_error = sum_error + sum_total
+        mse = np.square(sum_total_error)/jumlah_data
 
-        #hitung MSE
-        squared_difference = np.square(error[1:])
-        add_squared = np.nansum(squared_difference)
-        mean_squared_error = add_squared/jumlah_hari
+        #hitung MAPE
+        mape = np.nanmean(np.abs((kasus_error - forecast_error)/kasus_error))
 
-        forecast_terakhir = hasil[-1]
-
-        prediksi_besok = (alpha * data_terakhir) + (1 - alpha) * forecast_terakhir
-        prediksi_besok = int(prediksi_besok)
-
-        # masukkan forecast
-        copy_hasil = hasil.copy()
-        copy_hasil.insert(len(copy_hasil), prediksi_besok)
-        # print(copy_hasil)
-
-        #MAPE
-        mape = np.nanmean(np.abs((kasus_to_array[1:] - hasil[1:])/kasus_to_array[1:])) * 100
-        print(mape)
-        nilai_mape = "{:.2f}".format(mape)
-
-        ujimape = mean_absolute_percentage_error(kasus_to_array[1:], hasil[1:])
-        print(ujimape)
-
-
+        #prediksi periode berikutnya
+        next_period = final[-1]
 
         self.inputError.config(state='normal')
         self.inputMSE.config(state='normal')
@@ -132,68 +121,61 @@ class Peramalan(Config):
         self.inputAkurasi.delete(0, END)
 
         self.inputError.insert(END, mean_error)
-        self.inputMSE.insert(END, mean_squared_error)
-        self.inputPrediksi.insert(END, prediksi_besok)
-        self.inputAkurasi.insert(END, nilai_mape+'%')
+        self.inputMSE.insert(END, mse)
+        self.inputPrediksi.insert(END, next_period)
+        self.inputAkurasi.insert(END, mape)
 
         self.inputError.config(state='readonly')
         self.inputMSE.config(state='readonly')
         self.inputPrediksi.config(state='readonly')
         self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal_to_array, hasil, label='Ramalan')
-        plt.plot(tanggal_to_array, kasus_to_array, label='Aktual')
+        plt.plot(tanggal, final, label='Ramalan')
+        plt.plot(tanggal, kasus, label='Aktual')
         plt.legend()
         plt.show()
 
     def PreVaksin(self):
+        np.set_printoptions(precision=3, suppress=True)
         cwd = os.getcwd()
         target_file = '\exported\DataPreVaksin.csv'
         target_dir = cwd + target_file
         df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.1
+        alpha = 0.9
+        kasus = df['Kasus']
+        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
         hasil = []
-        error = []
-        t_plus_one_error = []
-        data_terakhir = df['Kasus'].tail(1)
-        baca_kasus = df['Kasus']
-        baca_tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
-        tanggal_to_array = np.array(baca_tanggal)
-        kasus_to_array = np.array(baca_kasus)
-        jumlah_hari = baca_tanggal.count()
+        jumlah_data = kasus.count()
 
-        for i in range(jumlah_hari):
-            kasus = baca_kasus.values[i]
-            t_plus_one = df['Kasus'].shift(1).values[i]
-            F_ke_n = (alpha * t_plus_one) + (1 - alpha) * kasus
-            hasil.append(F_ke_n)
-            t_plus_one_error.append(t_plus_one)
-            error.append(F_ke_n - t_plus_one)
+        for i, x in enumerate(kasus):
+            if i == 0:
+                res = x
+                hasil.append(x)
+            else:
+                tmp = alpha * x + (1 - alpha) * res
+                hasil.append(tmp)
+                res = tmp
 
-        mean_error = np.nansum(error) / jumlah_hari
+        final = np.array(hasil)
+        kasus_to_array = np.array(kasus)
 
-        # hitung MSE
-        squared_difference = np.square(error[1:])
-        add_squared = np.nansum(squared_difference)
-        mean_squared_error = add_squared / jumlah_hari
+        # hitung mean error
+        forecast_error = np.delete(final, [-1])
+        kasus_error = np.delete(kasus_to_array, [0])
+        error = np.subtract(kasus_error, forecast_error)
+        mean_error = np.nansum(error)
 
-        forecast_terakhir = hasil[-1]
+        # hitung mse
+        sum_error = np.nansum(error)
+        sum_total = np.nansum(kasus_to_array)
+        sum_total_error = sum_error + sum_total
+        mse = np.square(sum_total_error) / jumlah_data
 
-        prediksi_besok = (alpha * data_terakhir) + (1 - alpha) * forecast_terakhir
-        prediksi_besok = int(prediksi_besok)
+        # hitung MAPE
+        mape = np.nanmean(np.abs((kasus_error - forecast_error) / kasus_error))
 
-        # masukkan forecast
-        copy_hasil = hasil.copy()
-        copy_hasil.insert(len(copy_hasil), prediksi_besok)
-        # print(copy_hasil)
-
-        # MAPE
-        mape = np.nanmean(np.abs((kasus_to_array[1:] - hasil[1:]) / kasus_to_array[1:])) * 100
-        print(mape)
-        nilai_mape = "{:.2f}".format(mape)
-
-        ujimape = mean_absolute_percentage_error(kasus_to_array[1:], hasil[1:])
-        print(ujimape)
+        # prediksi periode berikutnya
+        next_period = final[-1]
 
         self.inputError.config(state='normal')
         self.inputMSE.config(state='normal')
@@ -206,67 +188,60 @@ class Peramalan(Config):
         self.inputAkurasi.delete(0, END)
 
         self.inputError.insert(END, mean_error)
-        self.inputMSE.insert(END, mean_squared_error)
-        self.inputPrediksi.insert(END, prediksi_besok)
-        self.inputAkurasi.insert(END, nilai_mape + '%')
+        self.inputMSE.insert(END, mse)
+        self.inputPrediksi.insert(END, next_period)
+        self.inputAkurasi.insert(END, mape)
 
         self.inputError.config(state='readonly')
         self.inputMSE.config(state='readonly')
         self.inputPrediksi.config(state='readonly')
         self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal_to_array, hasil, label='Ramalan Pre-Vaksin')
+        plt.plot(tanggal, final, label='Ramalan Pre Vaksin')
         plt.legend()
         plt.show()
 
     def PascaVaksin(self):
+        np.set_printoptions(precision=3, suppress=True)
         cwd = os.getcwd()
         target_file = '\exported\DataPascaVaksin.csv'
         target_dir = cwd + target_file
         df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.1
+        alpha = 0.9
+        kasus = df['Kasus']
+        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
         hasil = []
-        error = []
-        t_plus_one_error = []
-        data_terakhir = df['Kasus'].tail(1)
-        baca_kasus = df['Kasus']
-        baca_tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
-        tanggal_to_array = np.array(baca_tanggal)
-        kasus_to_array = np.array(baca_kasus)
-        jumlah_hari = baca_tanggal.count()
+        jumlah_data = kasus.count()
 
-        for i in range(jumlah_hari):
-            kasus = baca_kasus.values[i]
-            t_plus_one = df['Kasus'].shift(1).values[i]
-            F_ke_n = (alpha * t_plus_one) + (1 - alpha) * kasus
-            hasil.append(F_ke_n)
-            t_plus_one_error.append(t_plus_one)
-            error.append(F_ke_n - t_plus_one)
+        for i, x in enumerate(kasus):
+            if i == 0:
+                res = x
+                hasil.append(x)
+            else:
+                tmp = alpha * x + (1 - alpha) * res
+                hasil.append(tmp)
+                res = tmp
 
-        mean_error = np.nansum(error) / jumlah_hari
+        final = np.array(hasil)
+        kasus_to_array = np.array(kasus)
 
-        # hitung MSE
-        squared_difference = np.square(error[1:])
-        add_squared = np.nansum(squared_difference)
-        mean_squared_error = add_squared / jumlah_hari
+        # hitung mean error
+        forecast_error = np.delete(final, [-1])
+        kasus_error = np.delete(kasus_to_array, [0])
+        error = np.subtract(kasus_error, forecast_error)
+        mean_error = np.nansum(error)
 
-        forecast_terakhir = hasil[-1]
+        # hitung mse
+        sum_error = np.nansum(error)
+        sum_total = np.nansum(kasus_to_array)
+        sum_total_error = sum_error + sum_total
+        mse = np.square(sum_total_error) / jumlah_data
 
-        prediksi_besok = (alpha * data_terakhir) + (1 - alpha) * forecast_terakhir
-        prediksi_besok = int(prediksi_besok)
+        # hitung MAPE
+        mape = np.nanmean(np.abs((kasus_error - forecast_error) / kasus_error))
 
-        # masukkan forecast
-        copy_hasil = hasil.copy()
-        copy_hasil.insert(len(copy_hasil), prediksi_besok)
-        # print(copy_hasil)
-
-        # MAPE
-        mape = np.nanmean(np.abs((kasus_to_array[1:] - hasil[1:]) / kasus_to_array[1:])) * 100
-        print(mape)
-        nilai_mape = "{:.2f}".format(mape)
-
-        ujimape = mean_absolute_percentage_error(kasus_to_array[1:], hasil[1:])
-        print(ujimape)
+        # prediksi periode berikutnya
+        next_period = final[-1]
 
         self.inputError.config(state='normal')
         self.inputMSE.config(state='normal')
@@ -279,16 +254,16 @@ class Peramalan(Config):
         self.inputAkurasi.delete(0, END)
 
         self.inputError.insert(END, mean_error)
-        self.inputMSE.insert(END, mean_squared_error)
-        self.inputPrediksi.insert(END, prediksi_besok)
-        self.inputAkurasi.insert(END, nilai_mape + '%')
+        self.inputMSE.insert(END, mse)
+        self.inputPrediksi.insert(END, next_period)
+        self.inputAkurasi.insert(END, mape)
 
         self.inputError.config(state='readonly')
         self.inputMSE.config(state='readonly')
         self.inputPrediksi.config(state='readonly')
         self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal_to_array, hasil, label='Ramalan Pasca Vaksin')
+        plt.plot(tanggal, final, label='Ramalan Pre Vaksin')
         plt.legend()
         plt.show()
 

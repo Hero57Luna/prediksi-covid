@@ -18,7 +18,10 @@ class Config(object):
             password = self.__password,
             database = self.__database
         )
-        self.__db = db
+        try:
+            self.__db = db
+        except ConnectionRefusedError:
+            print("Sambungan gagal")
 
     def koneksiDB(self):
         konek = {
@@ -29,7 +32,7 @@ class Config(object):
         }
 
         try:
-            c = mysql.connector.connect(**konek)
+            c = mysql.connector.connect(konek)
             return c
         except mysql.connector.errors.InterfaceError:
             print("Sambungan gagal")

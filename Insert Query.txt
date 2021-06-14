@@ -1,0 +1,13 @@
+LOAD DATA INFILE 'D:\Positif.csv'
+INTO TABLE kasus
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+(@date_time_variable, Kasus)
+SET Tanggal = STR_TO_DATE(@date_time_variable, '%d-%b-%Y');
+
+LOAD DATA INFILE 'D:\\Bagas\\Kuliah\\Semester 8\\Skripsi\\prediksi-covid\\PositifProbolinggo.csv'
+INTO TABLE kasus_probolinggo
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\n'
+(@date_time_variable, Kasus)
+SET Tanggal = STR_TO_DATE(@date_time_variable, '%d/%m/%Y');
