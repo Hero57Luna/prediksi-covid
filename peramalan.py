@@ -91,6 +91,7 @@ class Peramalan(Config):
 
         final = np.array(hasil)
         kasus_to_array = np.array(kasus)
+        print(final)
 
         #hitung mean error
         forecast_error = np.delete(final, [-1])
@@ -105,10 +106,11 @@ class Peramalan(Config):
         mse = np.square(sum_total_error)/jumlah_data
 
         #hitung MAPE
-        mape = np.nanmean(np.abs((kasus_error - forecast_error)/kasus_error))
+        mape = np.nanmean(np.abs((kasus_to_array - final)/kasus_to_array)) * 100
+        mape = "{:.2f}".format(mape)
 
         #prediksi periode berikutnya
-        next_period = final[-1]
+        next_period = int(final[-1])
 
         self.inputError.config(state='normal')
         self.inputMSE.config(state='normal')
@@ -158,6 +160,7 @@ class Peramalan(Config):
 
         final = np.array(hasil)
         kasus_to_array = np.array(kasus)
+        print(final)
 
         # hitung mean error
         forecast_error = np.delete(final, [-1])
@@ -172,7 +175,7 @@ class Peramalan(Config):
         mse = np.square(sum_total_error) / jumlah_data
 
         # hitung MAPE
-        mape = np.nanmean(np.abs((kasus_error - forecast_error) / kasus_error))
+        mape = np.nanmean(np.abs((kasus_to_array - final) / kasus_to_array)) * 100
 
         # prediksi periode berikutnya
         next_period = final[-1]
@@ -207,7 +210,7 @@ class Peramalan(Config):
         target_file = '\exported\DataPascaVaksin.csv'
         target_dir = cwd + target_file
         df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.9
+        alpha = 0.5
         kasus = df['Kasus']
         tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
         hasil = []
@@ -238,7 +241,7 @@ class Peramalan(Config):
         mse = np.square(sum_total_error) / jumlah_data
 
         # hitung MAPE
-        mape = np.nanmean(np.abs((kasus_error - forecast_error) / kasus_error))
+        mape = np.nanmean(np.abs((kasus_to_array - final) / kasus_to_array)) * 100
 
         # prediksi periode berikutnya
         next_period = final[-1]
