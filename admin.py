@@ -90,17 +90,35 @@ class Admin(Config):
         entKonfirmasi = self.inputKonfirmasi.get()
         entBagian = self.inputBagian.get()
 
-        if len(entNama or entUsername or entPassword or entKonfirmasi or entBagian) > 0 :
-            if entPassword != entKonfirmasi :
-                messagebox.showwarning(title='Error', message='Konfirmasi password tidak sama!')
-            else:
-                self.create(entNama, entUsername, entPassword, entBagian)
-                self.trvTabel.delete(*self.trvTabel.get_children())
-                self.frame_tabel.after(0, self.table())
-                self.clear()
-        else:
-            messagebox.showerror(title='Error', message='Field harus lengkap')
+        entry_list = []
+        entry_list.extend((entNama, entUsername, entPassword, entKonfirmasi, entBagian))
 
+        for entry in enumerate(entry_list):
+            if not entNama:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entUsername:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entPassword:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entKonfirmasi:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entBagian:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            else:
+                if entPassword != entKonfirmasi:
+                    messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
+                    break
+                else:
+                    self.create(entNama, entUsername, entPassword, entBagian)
+                    self.trvTabel.delete(*self.trvTabel.get_children())
+                    self.frame_tabel.after(0, self.table())
+                    self.clear()
+                    break
     def onDelete(self):
         konfirmasi_hapus = messagebox.askquestion(title='Hapus data', message='Apakah Anda yakin ingin menghapus?', icon='warning')
         if konfirmasi_hapus == 'yes':
@@ -109,10 +127,7 @@ class Admin(Config):
             self.delete(get_id)
             self.trvTabel.delete(*self.trvTabel.get_children())
             self.frame_tabel.after(0, self.table())
-            self.clear()
-            self.updateButton.config(state='disabled')
-            self.deleteButton.config(state='disabled')
-            self.saveButton.config(state='normal')
+            self.onClear()
         else:
             pass
 
