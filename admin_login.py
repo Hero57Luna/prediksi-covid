@@ -8,12 +8,12 @@ root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
 
-class Login(Config):
+class AdminLogin(Config):
     def __init__(self, toplevel):
         self.toplevel = toplevel
-        super(Login, self).__init__()
+        super(AdminLogin, self).__init__()
         lebar = 350
-        tinggi = 500
+        tinggi = 360
         setTengahX = (self.toplevel.winfo_screenwidth()-lebar)//2
         setTengahY = (self.toplevel.winfo_screenheight()-tinggi)//2
         self.toplevel.geometry("%ix%i+%i+%i" % (lebar, tinggi, setTengahX, setTengahY))
@@ -25,16 +25,13 @@ class Login(Config):
         self.top_level.pack(side='top', fill='both', expand='true')
         label_frame = Frame(self.top_level, background='#808080', padx='10', pady='20')
         label_frame.pack(anchor='center', side='top', fill='x')
-        header_frame = Frame(self.top_level, background='#cedfe0', padx='10', pady='20')
-        header_frame.pack(anchor='center', side='top', fill='x')
         input_frame = Frame(self.top_level, background='#cedfe0', padx='20', pady='30')
         input_frame.pack(side='top', fill='both')
-        button_frame = Frame(self.top_level, background='#cedfe0', padx='10', pady='20')
+        button_frame = Frame(self.top_level, background='#cedfe0', padx='10', pady='10')
         button_frame.pack(side='top', fill='x')
 
         #atur label
-        Label(label_frame, background='#808080', text='Login', font='{Segoe UI Semibold} 14 {}').pack(side='top')
-        Label(header_frame, background='#cedfe0', text='Silahkan lakukan login \n terlebih dahulu', font='{Segoe UI Semibold} 16 {}').pack(side='top')
+        Label(label_frame, background='#808080', text='Admin Login', font='{Segoe UI Semibold} 14 {}').pack(side='top')
         Label(input_frame, background='#cedfe0', text='USERNAME', font='{Segoe UI Semibold} 12 {}').grid(column='0', row='0')
         Label(input_frame, background='#cedfe0', text='PASSWORD', font='{Segoe UI Semibold} 12 {}').grid(column='0', row='2')
 
@@ -47,27 +44,26 @@ class Login(Config):
         #button
         self.loginButton = Button(button_frame, font='{Arial} 10 {}', text='Login', width='40', command=self.proses_login)
         self.loginButton.grid(column='0', row='4')
-
-    def login_gagal(self):
-        pass
+        self.backButton = Button(button_frame, font='{Arial} 10 {}', text='Login', width='40', command=self.proses_login)
+        self.backButton.grid(column='0', row='5')
 
     def proses_login(self):
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
+
         if len(verifikasi_username or verifikasi_password) > 0:
-            sql = "SELECT * FROM user WHERE username = %s AND password = %s"
+            sql = "SELECT username, password FROM admin WHERE username = %s AND password = %s"
             cursor = self._Config__db.cursor()
-            cursor.execute(sql, [(verifikasi_username),(verifikasi_password)])
+            cursor.execute(sql, [(verifikasi_username), (verifikasi_password)])
             results = cursor.fetchall()
             if results:
                 root.destroy()
-                os.system('halaman_utama_admin.py')
-
+                os.system('admin.py')
             else:
                 messagebox.showerror(title='Error', message='Username atau Password salah')
         else:
             messagebox.showerror(title='Error', message='Username atau Password tidak boleh kosong')
 
 
-Login(root)
+AdminLogin(root)
 root.mainloop()

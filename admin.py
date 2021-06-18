@@ -139,17 +139,35 @@ class Admin(Config):
         entKonfirmasi = self.inputKonfirmasi.get()
         entBagian = self.inputBagian.get()
 
-        if entPassword != entKonfirmasi:
-            messagebox.showwarning(title='Error', message='Konfirmasi password tidak sama!')
+        entry_list = []
+        entry_list.extend((entNama, entUsername, entPassword, entKonfirmasi, entBagian))
 
-        else:
-            self.update(entNama, entUsername, entPassword, entBagian, entKode)
-            self.trvTabel.delete(*self.trvTabel.get_children())
-            self.frame_tabel.after(0, self.table())
-            self.clear()
-            self.updateButton.config(state='disabled')
-            self.deleteButton.config(state='disabled')
-            self.saveButton.config(state='normal')
+        for entry in enumerate(entry_list):
+            if not entNama:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entUsername:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entPassword:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entKonfirmasi:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            if not entBagian:
+                messagebox.showerror(title="Error", message="Field harus lengkap")
+                break
+            else:
+                if entPassword != entKonfirmasi:
+                    messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
+                    break
+                else:
+                    self.update(entNama, entUsername, entPassword, entBagian)
+                    self.trvTabel.delete(*self.trvTabel.get_children())
+                    self.frame_tabel.after(0, self.table())
+                    self.onClear()
+                    break
 
     def table(self):
         for kolom in judul_kolom:
@@ -194,9 +212,7 @@ class Admin(Config):
 
     def onKembali(self):
         root.destroy()
-        os.system('python halaman_utama_admin.py')
-
-
+        os.system('halaman_utama_admin.py')
 
     def onDoubleClick(self, event):
         self.saveButton.config(state='disabled')

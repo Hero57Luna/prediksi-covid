@@ -84,7 +84,7 @@ class InputPositif(Config):
 
     def onKembali(self):
         root.destroy()
-        os.system('python halaman_utama_admin.py')
+        os.system('halaman_utama_admin.py')
 
 InputPositif(root)
 root.mainloop()

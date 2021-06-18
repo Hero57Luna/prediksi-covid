@@ -38,15 +38,15 @@ class UtamaAdmin:
 
     def KelolaPengguna(self):
         root.destroy()
-        os.system('python admin.py')
+        os.system('admin_login.py')
 
     def InputDataPositif(self):
         root.destroy()
-        os.system('python halaman_input_positif.py')
+        os.system('halaman_input_positif.py')
 
     def PrediksiData(self):
         root.destroy()
-        os.system('python peramalan.py')
+        os.system('peramalan.py')
 
 UtamaAdmin(root)
 root.mainloop()
