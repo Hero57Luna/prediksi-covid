@@ -39,7 +39,7 @@ class Peramalan(Config):
             column='0', row='1', padx='30', pady='10', sticky='w')
         Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Prediksi Besok\t:').grid(
             column='0', row='2', padx='30', pady='10', sticky='w')
-        Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='MAPE\t\t: ').grid(
+        Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='WMAPE\t\t: ').grid(
             column='0', row='3', padx='30', pady='10', sticky='w')
 
         self.inputError = Entry(self.nilai_frame, state='readonly')
@@ -91,22 +91,27 @@ class Peramalan(Config):
 
         final = np.array(hasil)
         kasus_to_array = np.array(kasus)
-        print(final)
+
 
         #hitung mean error
-        forecast_error = np.delete(final, [-1])
-        kasus_error = np.delete(kasus_to_array, [0])
+        copy_forecast = final.copy()
+        copy_kasus = kasus_to_array.copy()
+        forecast_error = copy_forecast[:-1]
+        kasus_error = copy_kasus[1:]
         error = np.subtract(kasus_error, forecast_error)
         mean_error = np.nansum(error)
+        mean_error = '%.3f' % mean_error
+        print(final)
 
         #hitung mse
-        sum_error = np.nansum(error)
-        sum_total = np.nansum(kasus_to_array)
-        sum_total_error = sum_error + sum_total
-        mse = np.square(sum_total_error)/jumlah_data
+        squared_difference = error**2
+        sum_squared_difference = np.nansum(squared_difference)
+        mse = sum_squared_difference / jumlah_data
+        mse = '%.3f' % mse
+        print(mse)
 
         #hitung MAPE
-        mape = np.nanmean(np.abs((kasus_to_array - final)/kasus_to_array)) * 100
+        mape = np.nansum(np.abs(error))/np.nansum(kasus_error)
         mape = "{:.2f}".format(mape)
 
         #prediksi periode berikutnya
@@ -163,22 +168,28 @@ class Peramalan(Config):
         print(final)
 
         # hitung mean error
-        forecast_error = np.delete(final, [-1])
-        kasus_error = np.delete(kasus_to_array, [0])
+        copy_forecast = final.copy()
+        copy_kasus = kasus_to_array.copy()
+        forecast_error = copy_forecast[:-1]
+        kasus_error = copy_kasus[1:]
         error = np.subtract(kasus_error, forecast_error)
         mean_error = np.nansum(error)
+        mean_error = '%.3f' % mean_error
+        print(final)
 
         # hitung mse
-        sum_error = np.nansum(error)
-        sum_total = np.nansum(kasus_to_array)
-        sum_total_error = sum_error + sum_total
-        mse = np.square(sum_total_error) / jumlah_data
+        squared_difference = error ** 2
+        sum_squared_difference = np.nansum(squared_difference)
+        mse = sum_squared_difference / jumlah_data
+        mse = '%.3f' % mse
+        print(mse)
 
         # hitung MAPE
-        mape = np.nanmean(np.abs((kasus_to_array - final) / kasus_to_array)) * 100
+        mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
+        mape = "{:.2f}".format(mape)
 
         # prediksi periode berikutnya
-        next_period = final[-1]
+        next_period = int(final[-1])
 
         self.inputError.config(state='normal')
         self.inputMSE.config(state='normal')
@@ -210,7 +221,7 @@ class Peramalan(Config):
         target_file = '\exported\DataPascaVaksin.csv'
         target_dir = cwd + target_file
         df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.5
+        alpha = 0.9
         kasus = df['Kasus']
         tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
         hasil = []
@@ -229,22 +240,28 @@ class Peramalan(Config):
         kasus_to_array = np.array(kasus)
 
         # hitung mean error
-        forecast_error = np.delete(final, [-1])
-        kasus_error = np.delete(kasus_to_array, [0])
+        copy_forecast = final.copy()
+        copy_kasus = kasus_to_array.copy()
+        forecast_error = copy_forecast[:-1]
+        kasus_error = copy_kasus[1:]
         error = np.subtract(kasus_error, forecast_error)
         mean_error = np.nansum(error)
+        mean_error = '%.3f' % mean_error
+        print(final)
 
         # hitung mse
-        sum_error = np.nansum(error)
-        sum_total = np.nansum(kasus_to_array)
-        sum_total_error = sum_error + sum_total
-        mse = np.square(sum_total_error) / jumlah_data
+        squared_difference = error ** 2
+        sum_squared_difference = np.nansum(squared_difference)
+        mse = sum_squared_difference / jumlah_data
+        mse = '%.3f' % mse
+        print(mse)
 
         # hitung MAPE
-        mape = np.nanmean(np.abs((kasus_to_array - final) / kasus_to_array)) * 100
+        mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
+        mape = "{:.2f}".format(mape)
 
         # prediksi periode berikutnya
-        next_period = final[-1]
+        next_period = int(final[-1])
 
         self.inputError.config(state='normal')
         self.inputMSE.config(state='normal')
@@ -266,7 +283,7 @@ class Peramalan(Config):
         self.inputPrediksi.config(state='readonly')
         self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal, final, label='Ramalan Pre Vaksin')
+        plt.plot(tanggal, final, label='Ramalan Pasca Vaksin')
         plt.legend()
         plt.show()
 
