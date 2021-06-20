@@ -29,7 +29,7 @@ class Login(Config):
         header_frame.pack(anchor='center', side='top', fill='x')
         input_frame = Frame(self.top_level, background='#cedfe0', padx='20', pady='30')
         input_frame.pack(side='top', fill='both')
-        button_frame = Frame(self.top_level, background='#cedfe0', padx='10', pady='20')
+        button_frame = Frame(self.top_level, background='#cedfe0', padx='20', pady='20')
         button_frame.pack(side='top', fill='x')
 
         #atur label
@@ -45,7 +45,7 @@ class Login(Config):
         self.inputPassword.grid(column='0', row='3', pady='10')
 
         #button
-        self.loginButton = Button(button_frame, font='{Arial} 10 {}', text='Login', width='40', command=self.proses_login)
+        self.loginButton = Button(button_frame, font='{Segoe UI Semibold} 11 {}', text='Login', width='33', command=self.proses_login)
         self.loginButton.grid(column='0', row='4')
 
     def login_gagal(self):

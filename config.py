@@ -1,6 +1,8 @@
 import mysql.connector
-import os, glob, shutil
+import os, glob
+import sys
 from tkinter import messagebox
+import ctypes
 from pathlib import Path
 
 class Config(object):
@@ -10,7 +12,12 @@ class Config(object):
         self.__username = "root"
         self.__password = ""
         self.__database = "sisfo-covid"
-        self.buatKoneksi()
+        try:
+            self.buatKoneksi()
+        except mysql.connector.Error:
+            ICON_STOP = 0x10
+            ctypes.windll.user32.MessageBoxW(0, "Database Anda tidak terhubung, harap cek koneksi Database Anda", "Error", ICON_STOP)
+            sys.exit(0)
 
     def buatKoneksi(self):
         db = mysql.connector.connect(
@@ -19,10 +26,7 @@ class Config(object):
             password = self.__password,
             database = self.__database
         )
-        try:
-            self.__db = db
-        except ConnectionRefusedError:
-            print("Sambungan gagal")
+        self.__db = db
 
     def koneksiDB(self):
         konek = {
@@ -143,4 +147,4 @@ class Config(object):
 
 if __name__ == '__main__':
     Config()
-    os.system('python login.py')
+    os.system('login.py')

@@ -13,7 +13,7 @@ class AdminLogin(Config):
         self.toplevel = toplevel
         super(AdminLogin, self).__init__()
         lebar = 350
-        tinggi = 360
+        tinggi = 370
         setTengahX = (self.toplevel.winfo_screenwidth()-lebar)//2
         setTengahY = (self.toplevel.winfo_screenheight()-tinggi)//2
         self.toplevel.geometry("%ix%i+%i+%i" % (lebar, tinggi, setTengahX, setTengahY))
@@ -27,7 +27,7 @@ class AdminLogin(Config):
         label_frame.pack(anchor='center', side='top', fill='x')
         input_frame = Frame(self.top_level, background='#cedfe0', padx='20', pady='30')
         input_frame.pack(side='top', fill='both')
-        button_frame = Frame(self.top_level, background='#cedfe0', padx='10', pady='10')
+        button_frame = Frame(self.top_level, background='#cedfe0', padx='20', pady='5')
         button_frame.pack(side='top', fill='x')
 
         #atur label
@@ -42,10 +42,14 @@ class AdminLogin(Config):
         self.inputPassword.grid(column='0', row='3', pady='10')
 
         #button
-        self.loginButton = Button(button_frame, font='{Arial} 10 {}', text='Login', width='40', command=self.proses_login)
-        self.loginButton.grid(column='0', row='4')
-        self.backButton = Button(button_frame, font='{Arial} 10 {}', text='Login', width='40', command=self.proses_login)
-        self.backButton.grid(column='0', row='5')
+        self.loginButton = Button(button_frame, font='{Segoe UI Semibold} 11 {}', text='Login', width='33', command=self.proses_login)
+        self.loginButton.grid(column='0', row='4', pady='5')
+        self.backButton = Button(button_frame, font='{Segoe UI Semibold} 11 {}', text='Kembali', width='33', command=self.onKembali)
+        self.backButton.grid(column='0', row='5', pady='5')
+
+    def onKembali(self):
+        root.destroy()
+        os.system('halaman_utama_admin.py')
 
     def proses_login(self):
         verifikasi_username = self.inputUsername.get()

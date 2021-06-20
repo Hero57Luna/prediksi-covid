@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\admin_login.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\coba.py">
           <value>
             <Attribute>
