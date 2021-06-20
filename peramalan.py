@@ -35,7 +35,7 @@ class Peramalan(Config):
         self.button_frame.pack(side='top')
 
 
-        Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Mean Error\t:').grid(column='0', row='0', padx='30', pady='10', sticky='w')
+        Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='MAE\t\t:').grid(column='0', row='0', padx='30', pady='10', sticky='w')
         Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Nilai MSE\t\t:').grid(
             column='0', row='1', padx='30', pady='10', sticky='w')
         Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Prediksi Besok\t:').grid(
@@ -101,20 +101,18 @@ class Peramalan(Config):
             forecast_error = copy_forecast[:-1]
             kasus_error = copy_kasus[1:]
             error = np.subtract(kasus_error, forecast_error)
-            mean_error = np.nansum(error)
+            mean_error = np.abs(np.nansum(error))
             mean_error = '%.3f' % mean_error
-            print(final)
 
             #hitung mse
             squared_difference = error**2
             sum_squared_difference = np.nansum(squared_difference)
             mse = sum_squared_difference / jumlah_data
             mse = '%.3f' % mse
-            print(mse)
 
             #hitung MAPE
-            mape = np.nansum(np.abs(error))/np.nansum(kasus_error)
-            mape = "{:.2f}".format(mape)
+            mape = np.nansum(np.abs((kasus_to_array - final)/np.nansum(kasus_to_array))) * 100
+            mape = "{:.0f}".format(mape) + "%"
 
             #prediksi periode berikutnya
             next_period = int(final[-1])
@@ -171,7 +169,6 @@ class Peramalan(Config):
 
             final = np.array(hasil)
             kasus_to_array = np.array(kasus)
-            print(final)
 
             # hitung mean error
             copy_forecast = final.copy()
@@ -179,20 +176,19 @@ class Peramalan(Config):
             forecast_error = copy_forecast[:-1]
             kasus_error = copy_kasus[1:]
             error = np.subtract(kasus_error, forecast_error)
-            mean_error = np.nansum(error)
+            mean_error = np.abs(np.nansum(error))
             mean_error = '%.3f' % mean_error
-            print(final)
 
             # hitung mse
             squared_difference = error ** 2
             sum_squared_difference = np.nansum(squared_difference)
             mse = sum_squared_difference / jumlah_data
             mse = '%.3f' % mse
-            print(mse)
+
 
             # hitung MAPE
-            mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
-            mape = "{:.2f}".format(mape)
+            mape = np.nansum(np.abs((kasus_to_array - final) / np.nansum(kasus_to_array))) * 100
+            mape = "{:.0f}".format(mape) + "%"
 
             # prediksi periode berikutnya
             next_period = int(final[-1])
@@ -255,20 +251,20 @@ class Peramalan(Config):
             forecast_error = copy_forecast[:-1]
             kasus_error = copy_kasus[1:]
             error = np.subtract(kasus_error, forecast_error)
-            mean_error = np.nansum(error)
+            mean_error = np.abs(np.nansum(error))
             mean_error = '%.3f' % mean_error
-            print(final)
+
 
             # hitung mse
             squared_difference = error ** 2
             sum_squared_difference = np.nansum(squared_difference)
             mse = sum_squared_difference / jumlah_data
             mse = '%.3f' % mse
-            print(mse)
+
 
             # hitung MAPE
-            mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
-            mape = "{:.2f}".format(mape)
+            mape = np.nansum(np.abs((kasus_to_array - final) / np.nansum(kasus_to_array))) * 100
+            mape = "{:.0f}".format(mape) + "%"
 
             # prediksi periode berikutnya
             next_period = int(final[-1])
