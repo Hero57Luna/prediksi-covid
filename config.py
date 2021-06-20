@@ -1,5 +1,6 @@
 import mysql.connector
-import os
+import os, glob, shutil
+from tkinter import messagebox
 from pathlib import Path
 
 class Config(object):
@@ -125,9 +126,20 @@ class Config(object):
         cur.execute(query)
 
     def GenerateAllData(self):
-        self.GenerateCSVDataReal()
-        self.GenerateCSVDataPreVaksin()
-        self.GenerateCSVDataPascaVaksin()
+        dir = os.getcwd()
+        target = dir + '\exported'
+        try:
+            self.GenerateCSVDataReal()
+            self.GenerateCSVDataPreVaksin()
+            self.GenerateCSVDataPascaVaksin()
+        except mysql.connector.errors.DatabaseError:
+            peringatan = messagebox.askquestion(title='Warning', message='File sudah ada, apakah Anda ingin hapus?')
+            if peringatan == 'yes':
+               filelist = glob.glob(os.path.join(target, "*.csv"))
+               for f in filelist:
+                   os.remove(f)
+            else:
+                pass
 
 if __name__ == '__main__':
     Config()
