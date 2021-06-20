@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk, messagebox
 from config import Config
 import os
+import mysql.connector
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
@@ -114,10 +115,13 @@ class Admin(Config):
                     messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
                     break
                 else:
-                    self.create(entNama, entUsername, entPassword, entBagian)
-                    self.trvTabel.delete(*self.trvTabel.get_children())
-                    self.frame_tabel.after(0, self.table())
-                    self.clear()
+                    try:
+                        self.create(entNama, entUsername, entPassword, entBagian)
+                        self.trvTabel.delete(*self.trvTabel.get_children())
+                        self.frame_tabel.after(0, self.table())
+                        self.clear()
+                    except mysql.connector.errors.IntegrityError:
+                        messagebox.showerror(title='Error', message='Username ' + entUsername + ' sudah ada')
                     break
     def onDelete(self):
         konfirmasi_hapus = messagebox.askquestion(title='Hapus data', message='Apakah Anda yakin ingin menghapus?', icon='warning')

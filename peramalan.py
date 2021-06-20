@@ -1,5 +1,6 @@
 import pandas as pd
 from tkinter import *
+from tkinter import messagebox
 from matplotlib import pyplot as plt
 import numpy as np
 import os
@@ -69,223 +70,235 @@ class Peramalan(Config):
        self.GenerateAllData()
 
     def GenerateGraph(self):
-        np.set_printoptions(precision=3, suppress=True)
-        cwd = os.getcwd()
-        target_file = '\exported\Positif.csv'
-        target_dir = cwd + target_file
-        df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.9
-        kasus = df['Kasus']
-        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
-        hasil = []
-        jumlah_data = kasus.count()
+        try:
+            np.set_printoptions(precision=3, suppress=True)
+            cwd = os.getcwd()
+            target_file = '\exported\Positif.csv'
+            target_dir = cwd + target_file
+            df = pd.read_csv(target_dir, parse_dates=True)
+            alpha = 0.9
+            kasus = df['Kasus']
+            tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
+            hasil = []
+            jumlah_data = kasus.count()
 
-        for i, x in enumerate(kasus):
-            if i == 0:
-                res = x
-                hasil.append(x)
-            else:
-                tmp = alpha * x + (1 - alpha) * res
-                hasil.append(tmp)
-                res = tmp
+            for i, x in enumerate(kasus):
+                if i == 0:
+                    res = x
+                    hasil.append(x)
+                else:
+                    tmp = alpha * x + (1 - alpha) * res
+                    hasil.append(tmp)
+                    res = tmp
 
-        final = np.array(hasil)
-        kasus_to_array = np.array(kasus)
+            final = np.array(hasil)
+            kasus_to_array = np.array(kasus)
 
 
-        #hitung mean error
-        copy_forecast = final.copy()
-        copy_kasus = kasus_to_array.copy()
-        forecast_error = copy_forecast[:-1]
-        kasus_error = copy_kasus[1:]
-        error = np.subtract(kasus_error, forecast_error)
-        mean_error = np.nansum(error)
-        mean_error = '%.3f' % mean_error
-        print(final)
+            #hitung mean error
+            copy_forecast = final.copy()
+            copy_kasus = kasus_to_array.copy()
+            forecast_error = copy_forecast[:-1]
+            kasus_error = copy_kasus[1:]
+            error = np.subtract(kasus_error, forecast_error)
+            mean_error = np.nansum(error)
+            mean_error = '%.3f' % mean_error
+            print(final)
 
-        #hitung mse
-        squared_difference = error**2
-        sum_squared_difference = np.nansum(squared_difference)
-        mse = sum_squared_difference / jumlah_data
-        mse = '%.3f' % mse
-        print(mse)
+            #hitung mse
+            squared_difference = error**2
+            sum_squared_difference = np.nansum(squared_difference)
+            mse = sum_squared_difference / jumlah_data
+            mse = '%.3f' % mse
+            print(mse)
 
-        #hitung MAPE
-        mape = np.nansum(np.abs(error))/np.nansum(kasus_error)
-        mape = "{:.2f}".format(mape)
+            #hitung MAPE
+            mape = np.nansum(np.abs(error))/np.nansum(kasus_error)
+            mape = "{:.2f}".format(mape)
 
-        #prediksi periode berikutnya
-        next_period = int(final[-1])
+            #prediksi periode berikutnya
+            next_period = int(final[-1])
+            next_period_to_str = str(next_period) + ' orang'
 
-        self.inputError.config(state='normal')
-        self.inputMSE.config(state='normal')
-        self.inputPrediksi.config(state='normal')
-        self.inputAkurasi.config(state='normal')
+            self.inputError.config(state='normal')
+            self.inputMSE.config(state='normal')
+            self.inputPrediksi.config(state='normal')
+            self.inputAkurasi.config(state='normal')
 
-        self.inputError.delete(0, END)
-        self.inputMSE.delete(0, END)
-        self.inputPrediksi.delete(0, END)
-        self.inputAkurasi.delete(0, END)
+            self.inputError.delete(0, END)
+            self.inputMSE.delete(0, END)
+            self.inputPrediksi.delete(0, END)
+            self.inputAkurasi.delete(0, END)
 
-        self.inputError.insert(END, mean_error)
-        self.inputMSE.insert(END, mse)
-        self.inputPrediksi.insert(END, next_period)
-        self.inputAkurasi.insert(END, mape)
+            self.inputError.insert(END, mean_error)
+            self.inputMSE.insert(END, mse)
+            self.inputPrediksi.insert(END, next_period_to_str)
+            self.inputAkurasi.insert(END, mape)
 
-        self.inputError.config(state='readonly')
-        self.inputMSE.config(state='readonly')
-        self.inputPrediksi.config(state='readonly')
-        self.inputAkurasi.config(state='readonly')
+            self.inputError.config(state='readonly')
+            self.inputMSE.config(state='readonly')
+            self.inputPrediksi.config(state='readonly')
+            self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal, final, label='Ramalan')
-        plt.plot(tanggal, kasus, label='Aktual')
-        plt.legend()
-        plt.show()
+            plt.plot(tanggal, final, label='Ramalan')
+            plt.plot(tanggal, kasus, label='Aktual')
+            plt.legend()
+            plt.show()
+        except FileNotFoundError:
+            messagebox.showerror(title='Error', message='File data tidak ditemukan')
 
     def PreVaksin(self):
-        np.set_printoptions(precision=3, suppress=True)
-        cwd = os.getcwd()
-        target_file = '\exported\DataPreVaksin.csv'
-        target_dir = cwd + target_file
-        df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.9
-        kasus = df['Kasus']
-        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
-        hasil = []
-        jumlah_data = kasus.count()
+        try:
+            np.set_printoptions(precision=3, suppress=True)
+            cwd = os.getcwd()
+            target_file = '\exported\DataPreVaksin.csv'
+            target_dir = cwd + target_file
+            df = pd.read_csv(target_dir, parse_dates=True)
+            alpha = 0.9
+            kasus = df['Kasus']
+            tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
+            hasil = []
+            jumlah_data = kasus.count()
 
-        for i, x in enumerate(kasus):
-            if i == 0:
-                res = x
-                hasil.append(x)
-            else:
-                tmp = alpha * x + (1 - alpha) * res
-                hasil.append(tmp)
-                res = tmp
+            for i, x in enumerate(kasus):
+                if i == 0:
+                    res = x
+                    hasil.append(x)
+                else:
+                    tmp = alpha * x + (1 - alpha) * res
+                    hasil.append(tmp)
+                    res = tmp
 
-        final = np.array(hasil)
-        kasus_to_array = np.array(kasus)
-        print(final)
+            final = np.array(hasil)
+            kasus_to_array = np.array(kasus)
+            print(final)
 
-        # hitung mean error
-        copy_forecast = final.copy()
-        copy_kasus = kasus_to_array.copy()
-        forecast_error = copy_forecast[:-1]
-        kasus_error = copy_kasus[1:]
-        error = np.subtract(kasus_error, forecast_error)
-        mean_error = np.nansum(error)
-        mean_error = '%.3f' % mean_error
-        print(final)
+            # hitung mean error
+            copy_forecast = final.copy()
+            copy_kasus = kasus_to_array.copy()
+            forecast_error = copy_forecast[:-1]
+            kasus_error = copy_kasus[1:]
+            error = np.subtract(kasus_error, forecast_error)
+            mean_error = np.nansum(error)
+            mean_error = '%.3f' % mean_error
+            print(final)
 
-        # hitung mse
-        squared_difference = error ** 2
-        sum_squared_difference = np.nansum(squared_difference)
-        mse = sum_squared_difference / jumlah_data
-        mse = '%.3f' % mse
-        print(mse)
+            # hitung mse
+            squared_difference = error ** 2
+            sum_squared_difference = np.nansum(squared_difference)
+            mse = sum_squared_difference / jumlah_data
+            mse = '%.3f' % mse
+            print(mse)
 
-        # hitung MAPE
-        mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
-        mape = "{:.2f}".format(mape)
+            # hitung MAPE
+            mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
+            mape = "{:.2f}".format(mape)
 
-        # prediksi periode berikutnya
-        next_period = int(final[-1])
+            # prediksi periode berikutnya
+            next_period = int(final[-1])
+            next_period_to_str = str(next_period) + ' orang'
 
-        self.inputError.config(state='normal')
-        self.inputMSE.config(state='normal')
-        self.inputPrediksi.config(state='normal')
-        self.inputAkurasi.config(state='normal')
+            self.inputError.config(state='normal')
+            self.inputMSE.config(state='normal')
+            self.inputPrediksi.config(state='normal')
+            self.inputAkurasi.config(state='normal')
 
-        self.inputError.delete(0, END)
-        self.inputMSE.delete(0, END)
-        self.inputPrediksi.delete(0, END)
-        self.inputAkurasi.delete(0, END)
+            self.inputError.delete(0, END)
+            self.inputMSE.delete(0, END)
+            self.inputPrediksi.delete(0, END)
+            self.inputAkurasi.delete(0, END)
 
-        self.inputError.insert(END, mean_error)
-        self.inputMSE.insert(END, mse)
-        self.inputPrediksi.insert(END, next_period)
-        self.inputAkurasi.insert(END, mape)
+            self.inputError.insert(END, mean_error)
+            self.inputMSE.insert(END, mse)
+            self.inputPrediksi.insert(END, next_period_to_str)
+            self.inputAkurasi.insert(END, mape)
 
-        self.inputError.config(state='readonly')
-        self.inputMSE.config(state='readonly')
-        self.inputPrediksi.config(state='readonly')
-        self.inputAkurasi.config(state='readonly')
+            self.inputError.config(state='readonly')
+            self.inputMSE.config(state='readonly')
+            self.inputPrediksi.config(state='readonly')
+            self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal, final, label='Ramalan Pre Vaksin')
-        plt.legend()
-        plt.show()
+            plt.plot(tanggal, final, label='Ramalan Pre Vaksin')
+            plt.legend()
+            plt.show()
+        except FileNotFoundError:
+            messagebox.showerror(title='Error', message='File data tidak ditemukan')
 
     def PascaVaksin(self):
-        np.set_printoptions(precision=3, suppress=True)
-        cwd = os.getcwd()
-        target_file = '\exported\DataPascaVaksin.csv'
-        target_dir = cwd + target_file
-        df = pd.read_csv(target_dir, parse_dates=True)
-        alpha = 0.9
-        kasus = df['Kasus']
-        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
-        hasil = []
-        jumlah_data = kasus.count()
+        try:
+            np.set_printoptions(precision=3, suppress=True)
+            cwd = os.getcwd()
+            target_file = '\exported\DataPascaVaksin.csv'
+            target_dir = cwd + target_file
+            df = pd.read_csv(target_dir, parse_dates=True)
+            alpha = 0.9
+            kasus = df['Kasus']
+            tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y')
+            hasil = []
+            jumlah_data = kasus.count()
 
-        for i, x in enumerate(kasus):
-            if i == 0:
-                res = x
-                hasil.append(x)
-            else:
-                tmp = alpha * x + (1 - alpha) * res
-                hasil.append(tmp)
-                res = tmp
+            for i, x in enumerate(kasus):
+                if i == 0:
+                    res = x
+                    hasil.append(x)
+                else:
+                    tmp = alpha * x + (1 - alpha) * res
+                    hasil.append(tmp)
+                    res = tmp
 
-        final = np.array(hasil)
-        kasus_to_array = np.array(kasus)
+            final = np.array(hasil)
+            kasus_to_array = np.array(kasus)
 
-        # hitung mean error
-        copy_forecast = final.copy()
-        copy_kasus = kasus_to_array.copy()
-        forecast_error = copy_forecast[:-1]
-        kasus_error = copy_kasus[1:]
-        error = np.subtract(kasus_error, forecast_error)
-        mean_error = np.nansum(error)
-        mean_error = '%.3f' % mean_error
-        print(final)
+            # hitung mean error
+            copy_forecast = final.copy()
+            copy_kasus = kasus_to_array.copy()
+            forecast_error = copy_forecast[:-1]
+            kasus_error = copy_kasus[1:]
+            error = np.subtract(kasus_error, forecast_error)
+            mean_error = np.nansum(error)
+            mean_error = '%.3f' % mean_error
+            print(final)
 
-        # hitung mse
-        squared_difference = error ** 2
-        sum_squared_difference = np.nansum(squared_difference)
-        mse = sum_squared_difference / jumlah_data
-        mse = '%.3f' % mse
-        print(mse)
+            # hitung mse
+            squared_difference = error ** 2
+            sum_squared_difference = np.nansum(squared_difference)
+            mse = sum_squared_difference / jumlah_data
+            mse = '%.3f' % mse
+            print(mse)
 
-        # hitung MAPE
-        mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
-        mape = "{:.2f}".format(mape)
+            # hitung MAPE
+            mape = np.nansum(np.abs(error)) / np.nansum(kasus_error)
+            mape = "{:.2f}".format(mape)
 
-        # prediksi periode berikutnya
-        next_period = int(final[-1])
+            # prediksi periode berikutnya
+            next_period = int(final[-1])
+            next_period_to_str = str(next_period) + ' orang'
 
-        self.inputError.config(state='normal')
-        self.inputMSE.config(state='normal')
-        self.inputPrediksi.config(state='normal')
-        self.inputAkurasi.config(state='normal')
+            self.inputError.config(state='normal')
+            self.inputMSE.config(state='normal')
+            self.inputPrediksi.config(state='normal')
+            self.inputAkurasi.config(state='normal')
 
-        self.inputError.delete(0, END)
-        self.inputMSE.delete(0, END)
-        self.inputPrediksi.delete(0, END)
-        self.inputAkurasi.delete(0, END)
+            self.inputError.delete(0, END)
+            self.inputMSE.delete(0, END)
+            self.inputPrediksi.delete(0, END)
+            self.inputAkurasi.delete(0, END)
 
-        self.inputError.insert(END, mean_error)
-        self.inputMSE.insert(END, mse)
-        self.inputPrediksi.insert(END, next_period)
-        self.inputAkurasi.insert(END, mape)
+            self.inputError.insert(END, mean_error)
+            self.inputMSE.insert(END, mse)
+            self.inputPrediksi.insert(END, next_period_to_str)
+            self.inputAkurasi.insert(END, mape)
 
-        self.inputError.config(state='readonly')
-        self.inputMSE.config(state='readonly')
-        self.inputPrediksi.config(state='readonly')
-        self.inputAkurasi.config(state='readonly')
+            self.inputError.config(state='readonly')
+            self.inputMSE.config(state='readonly')
+            self.inputPrediksi.config(state='readonly')
+            self.inputAkurasi.config(state='readonly')
 
-        plt.plot(tanggal, final, label='Ramalan Pasca Vaksin')
-        plt.legend()
-        plt.show()
+            plt.plot(tanggal, final, label='Ramalan Pasca Vaksin')
+            plt.legend()
+            plt.show()
+        except FileNotFoundError:
+            messagebox.showerror(title='Error', message='File data tidak ditemukan')
 
 Peramalan(root)
 root.mainloop()
