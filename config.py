@@ -1,8 +1,10 @@
 import mysql.connector
 import os, glob
 import sys
+import mysql.connector.locales.eng.client_error
 from tkinter import messagebox
 import ctypes
+
 from pathlib import Path
 
 class Config(object):
@@ -87,10 +89,6 @@ class Config(object):
         exported_path = Path('.').absolute() / 'exported' / 'Positif.csv'
         target = '%r'%str(exported_path)
 
-        #export untuk data pre vaksin
-        exported_path_prevaksin = Path('.').absolute() / 'exported' / 'DataPreVaksin.csv'
-        target_prevaksin = '%r'%str(exported_path_prevaksin)
-
         query = "SELECT 'Tanggal','Kasus' " \
                 "UNION " \
                 "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
@@ -105,13 +103,14 @@ class Config(object):
         exported_path = Path('.').absolute() / 'exported' / 'DataPreVaksin.csv'
         target = '%r'%str(exported_path)
 
-        query = "SELECT 'Tanggal','Kasus' " \
+        query = "SELECT 'Tanggal','Kasus' "\
                 "UNION " \
                 "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
-                "Kasus FROM dataprevaksin " \
+                "Kasus FROM datareal WHERE Tanggal >= '2020-04-07' AND Tanggal <= '2021-02-23' " \
                 "INTO OUTFILE {} " \
                 "FIELDS TERMINATED BY ',' " \
-                "LINES TERMINATED BY '\n' ;".format(target)
+                "LINES TERMINATED BY '\n' ".format(target)
+
         cur = self.__db.cursor()
         cur.execute(query)
 
@@ -119,13 +118,13 @@ class Config(object):
         exported_path = Path('.').absolute() / 'exported' / 'DataPascaVaksin.csv'
         target = '%r' % str(exported_path)
 
-        query = "SELECT 'Tanggal','Kasus' " \
+        query = "SELECT 'Tanggal','Kasus' "\
                 "UNION " \
                 "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
-                "Kasus FROM datapascavaksin " \
+                "Kasus FROM datareal WHERE Tanggal >= '2021-02-24' AND Tanggal <= '2021-05-08' " \
                 "INTO OUTFILE {} " \
                 "FIELDS TERMINATED BY ',' " \
-                "LINES TERMINATED BY '\n' ;".format(target)
+                "LINES TERMINATED BY '\n' ".format(target)
         cur = self.__db.cursor()
         cur.execute(query)
 
@@ -133,8 +132,8 @@ class Config(object):
         dir = os.getcwd()
         target = dir + '\exported'
         try:
-            self.GenerateCSVDataReal()
             self.GenerateCSVDataPreVaksin()
+            self.GenerateCSVDataReal()
             self.GenerateCSVDataPascaVaksin()
         except mysql.connector.errors.DatabaseError:
             peringatan = messagebox.askquestion(title='Warning', message='File sudah ada, apakah Anda ingin hapus?')

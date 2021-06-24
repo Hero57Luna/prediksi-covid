@@ -167,7 +167,7 @@ class Admin(Config):
                     messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
                     break
                 else:
-                    self.update(entNama, entUsername, entPassword, entBagian)
+                    self.update(entNama, entUsername, entPassword, entBagian, entKode)
                     self.trvTabel.delete(*self.trvTabel.get_children())
                     self.frame_tabel.after(0, self.table())
                     self.onClear()

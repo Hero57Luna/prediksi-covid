@@ -40,7 +40,7 @@ class Peramalan(Config):
             column='0', row='1', padx='30', pady='10', sticky='w')
         Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Prediksi Besok\t:').grid(
             column='0', row='2', padx='30', pady='10', sticky='w')
-        Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='WMAPE\t\t: ').grid(
+        Label(self.nilai_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='MAPE\t\t: ').grid(
             column='0', row='3', padx='30', pady='10', sticky='w')
 
         self.inputError = Entry(self.nilai_frame, state='readonly')
