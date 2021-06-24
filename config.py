@@ -60,7 +60,7 @@ class Config(object):
         self.jumlah = jumlah
         cursor = self.__db.cursor()
         value = (tanggal, jumlah)
-        cursor.execute("INSERT INTO kasus_probolinggo (Tanggal, Kasus) VALUES (%s, %s)", value)
+        cursor.execute("INSERT INTO datareal (Tanggal, Kasus) VALUES (%s, %s)", value)
         self.__db.commit()
 
 

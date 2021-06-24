@@ -62,15 +62,17 @@ class InputPositif(Config):
             if len(entTanggal) > 0 :
                 if len(entKasus) > 0 :
                     try:
+                        kasusInt = int(entKasus)
                         datetime.datetime.strptime(tanggalString, format)
-                        if isinstance(entKasus, int) == TRUE:
-                            self.insertKasus(entTanggal, entKasus)
+                        konfirmasi = messagebox.askquestion(title='Konfirmasi', message='Tanggal {} dengan kasus {} orang \n Apkah sudah benar?'.format(entTanggal, entKasus))
+                        if konfirmasi == 'yes':
+                            self.insertKasus(entTanggal, kasusInt)
                             self.onClear()
                             messagebox.showinfo(title='Sukses', message='Data berhasil dimasukkan')
                         else:
-                            messagebox.showerror(title='Error', message='Kasus harus angka')
+                            pass
                     except ValueError:
-                        messagebox.showerror(title='Error', message='Format tanggal salah!')
+                        messagebox.showerror(title='Error', message='Mohon cek kembali format tanggal dan kasus')
                 else:
                     messagebox.showerror(title='Error',message='Kasus tidak boleh kosong')
             else:
