@@ -23,7 +23,6 @@ class Admin(Config):
         #self.parent.overrideredirect(1)
         self.komponen()
 
-
     def komponen(self):
         #atur frame
         top_level = Frame(self.parent, background='#cedfe0')

@@ -66,6 +66,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\halaman_utama_user.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\login.py">
           <value>
             <Attribute>

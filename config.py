@@ -4,7 +4,6 @@ import sys
 import mysql.connector.locales.eng.client_error
 from tkinter import messagebox
 import ctypes
-
 from pathlib import Path
 
 class Config(object):
@@ -66,9 +65,15 @@ class Config(object):
 
     def read(self):
         cur = self.__db.cursor()
-        cur.execute("SELECT id, nama, username, password, bagian FROM user")
+        cur.execute("SELECT id, nama, username, password, role FROM user")
         data_user = cur.fetchall()
         return data_user
+
+    def read_kasus(self):
+        cur = self.__db.cursor()
+        cur.execute("SELECT Tanggal, Kasus FROM datareal")
+        kasus = cur.fetchall()
+        return kasus
 
     def update(self, nama, username, password, bagian, kode):
         cursor = self.__db.cursor()

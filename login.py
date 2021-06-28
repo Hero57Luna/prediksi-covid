@@ -52,19 +52,26 @@ class Login(Config):
         pass
 
     def proses_login(self):
+        cursor = self._Config__db.cursor()
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
         if len(verifikasi_username or verifikasi_password) > 0:
-            sql = "SELECT * FROM user WHERE username = %s AND password = %s"
-            cursor = self._Config__db.cursor()
-            cursor.execute(sql, [(verifikasi_username),(verifikasi_password)])
-            results = cursor.fetchall()
+            sql = "SELECT id_user FROM login WHERE username = '{}' AND password = '{}'".format(verifikasi_username,
+                                                                                               verifikasi_password)
+            cursor.execute(sql)
+            results = cursor.fetchone()
             if results:
-                root.destroy()
-                os.system('halaman_utama_admin.py')
-
+                user_query = "SELECT role FROM user WHERE id = {}".format(results[0])
+                cursor.execute(user_query)
+                hasil_user = cursor.fetchone()
+                if hasil_user[0] == 'ADM':
+                    root.destroy()
+                    os.system('halaman_utama_admin.py')
+                elif hasil_user[0] == 'USR':
+                    root.destroy()
+                    os.system('halaman_utama_user.py')
             else:
-                messagebox.showerror(title='Error', message='Username atau Password salah')
+                print("User tidak ditemukan")
         else:
             messagebox.showerror(title='Error', message='Username atau Password tidak boleh kosong')
 
