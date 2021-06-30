@@ -56,8 +56,7 @@ class Login(Config):
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
         if len(verifikasi_username or verifikasi_password) > 0:
-            sql = "SELECT id_user FROM login WHERE username = '{}' AND password = '{}'".format(verifikasi_username,
-                                                                                               verifikasi_password)
+            sql = "SELECT id_user FROM login WHERE username = '{}' AND password = '{}'".format(verifikasi_username, verifikasi_password)
             cursor.execute(sql)
             results = cursor.fetchone()
             if results:
@@ -71,7 +70,7 @@ class Login(Config):
                     root.destroy()
                     os.system('halaman_utama_user.py')
             else:
-                print("User tidak ditemukan")
+                messagebox.showerror(title='Error', message='Username atau Password Anda salah')
         else:
             messagebox.showerror(title='Error', message='Username atau Password tidak boleh kosong')
 

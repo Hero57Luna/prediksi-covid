@@ -38,7 +38,7 @@ class UtamaAdmin:
 
     def KelolaPengguna(self):
         root.destroy()
-        os.system('admin_login.py')
+        os.system('admin.py')
 
     def InputDataPositif(self):
         root.destroy()

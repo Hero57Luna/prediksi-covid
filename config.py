@@ -44,14 +44,22 @@ class Config(object):
             print("Sambungan gagal")
             exit(1)
 
-    def create(self, nama, username, password, bagian):
+    def create(self, nama, telepon, role, username, password):
         self.nama = nama
+        self.telepon = telepon
         self.username = username
         self.password = password
-        self.bagian = bagian
-        cursor = self.__db.cursor()
-        val = (nama, username, password, bagian)
-        cursor.execute("INSERT INTO user (nama, username, password, bagian) VALUES (%s, %s, %s, %s)", val)
+        self.role = role
+        cursor = self.__db.cursor(buffered=True)
+        results = cursor.execute("BEGIN;"
+                       "INSERT INTO user (nama, telepon, role) "
+                       "VALUES('{}', '{}', '{}');"
+                       "INSERT INTO login (id_user, username, password) "
+                       "VALUES(LAST_INSERT_ID(), '{}', '{}');"
+                       .format(nama, telepon, role, username, password), multi=True)
+        for cur in results:
+            if cur.with_rows:
+                cur.fetchall()
         self.__db.commit()
 
     def insertKasus(self, tanggal, jumlah):
@@ -63,23 +71,36 @@ class Config(object):
         self.__db.commit()
 
 
-    def read(self):
+    def read_login(self):
         cur = self.__db.cursor()
-        cur.execute("SELECT id, nama, username, password, role FROM user")
+        cur.execute("SELECT username FROM login")
         data_user = cur.fetchall()
         return data_user
 
     def read_kasus(self):
         cur = self.__db.cursor()
-        cur.execute("SELECT Tanggal, Kasus FROM datareal")
-        kasus = cur.fetchall()
-        return kasus
+        cur.execute("SELECT Tanggal, Kasus, username FROM datareal")
+        data_kasus = cur.fetchall()
+        return data_kasus
 
-    def update(self, nama, username, password, bagian, kode):
-        cursor = self.__db.cursor()
-        val = (nama, username, password, bagian, kode)
-        sql = "UPDATE user SET nama=%s, username=%s, password=%s, bagian=%s WHERE id=%s"
-        cursor.execute(sql,(val))
+    def read_user(self):
+        cur = self.__db.cursor()
+        cur.execute("SELECT user.id, user.nama, user.telepon, login.username, login.password, user.role "
+                    "FROM user "
+                    "INNER JOIN login ON user.id=login.id_user")
+        data_user = cur.fetchall()
+        return data_user
+
+    def update(self, nama, telepon, role, username, password, id):
+        cursor = self.__db.cursor(buffered=True)
+        val = (nama, telepon, role, username, password, id)
+        sql = "BEGIN;" \
+              "UPDATE user SET nama = '{0}', telepon = '{1}', role= '{2}' WHERE id = {3};" \
+              "UPDATE login SET username = '{4}', password = '{5}' WHERE id_user = {3};".format(nama, telepon, role, id, username, password)
+        results = cursor.execute(sql, multi=True)
+        for cur in results:
+            if cur.with_rows:
+                cur.fetchall()
         self.__db.commit()
 
     def delete(self, id):
