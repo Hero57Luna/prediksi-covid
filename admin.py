@@ -82,7 +82,7 @@ class Admin(Config):
         self.clearButton.grid(column='3', row='0', sticky='w', padx='30')
         self.backButton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', width='8', command=self.onKembali)
         self.backButton.grid(column='0', row='0', padx='30', pady='10', sticky='w')
-        self.changePassword = Button(input_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Ganti Password')
+        self.changePassword = Button(input_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Ganti Password', state='disabled', command=self.onChangePassword)
         self.changePassword.grid(column='2', row='3', sticky='w')
 
         #tabel
@@ -231,10 +231,15 @@ class Admin(Config):
         self.updateButton.config(state='disabled')
         self.deleteButton.config(state='disabled')
         self.saveButton.config(state='normal')
+        self.changePassword.config(state='disabled')
 
     def onKembali(self):
         root.destroy()
         os.system('halaman_utama_admin.py')
+
+    def onChangePassword(self):
+        root.destroy()
+        os.system('halaman_ganti_password.py')
 
     def onDoubleClick(self, event):
         self.saveButton.config(state='disabled')
@@ -255,6 +260,7 @@ class Admin(Config):
         self.inputPassword.insert(END, item[4])
         self.inputPassword.config(state='readonly')
         self.value_inside.set(item[5])
+        self.changePassword.config(state='normal')
 
 
 Admin(root)

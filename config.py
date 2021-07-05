@@ -170,6 +170,12 @@ class Config(object):
             else:
                 pass
 
+    def changePassword(self, password, id):
+        cursor = self.__db.cursor()
+        sql = "UPDATE login SET password = '{}' WHERE id_user = {}".format(password, id)
+        cursor.execute(sql)
+        self.__db.commit()
+
 if __name__ == '__main__':
     Config()
     os.system('login.py')

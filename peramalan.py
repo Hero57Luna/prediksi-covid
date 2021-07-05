@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import os
 from config import Config
-from sklearn.metrics import mean_absolute_percentage_error
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
