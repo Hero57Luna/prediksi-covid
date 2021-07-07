@@ -83,6 +83,12 @@ class Config(object):
         data_kasus = cur.fetchall()
         return data_kasus
 
+    def read_positif(self):
+        cur = self.__db.cursor()
+        cur.execute("SELECT datareal.Tanggal, datareal.Kasus, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id")
+        data_positif = cur.fetchall()
+        return data_positif
+
     def read_user(self):
         cur = self.__db.cursor()
         cur.execute("SELECT user.id, user.nama, user.telepon, login.username, login.password, user.role "
@@ -90,6 +96,39 @@ class Config(object):
                     "INNER JOIN login ON user.id=login.id_user")
         data_user = cur.fetchall()
         return data_user
+
+    def kasus_terbesar(self):
+        cur = self.__db.cursor()
+        cur.execute("SELECT MAX(Kasus) FROM datareal")
+        kasus_terbesar = cur.fetchall()
+        return kasus_terbesar
+
+    def kasus_terkecil(self):
+        cur = self.__db.cursor()
+        cur.execute("SELECT MIN(Kasus) FROM datareal")
+        kasus_terkecil = cur.fetchall()
+        return kasus_terkecil
+
+    def read_jumlah_data(self):
+        cur = self.__db.cursor()
+        sql = "SELECT COUNT(Tanggal) AS JumlahData FROM datareal"
+        cur.execute(sql)
+        jumlah_data = cur.fetchall()
+        return jumlah_data
+
+    def read_total_kasus(self):
+        cur = self.__db.cursor()
+        sql = "SELECT SUM(Kasus) AS JumlahKasus FROM datareal"
+        cur.execute(sql)
+        total_kasus = cur.fetchall()
+        return total_kasus
+
+    def search_kasus(self, index):
+        cur = self.__db.cursor()
+        sql = "SELECT datareal.Tanggal, datareal.Kasus, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id WHERE Tanggal LIKE '%{}%'".format(index)
+        cur.execute(sql)
+        search_kasus = cur.fetchall()
+        return search_kasus
 
     def update(self, nama, telepon, role, username, password, id):
         cursor = self.__db.cursor(buffered=True)
