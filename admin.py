@@ -22,7 +22,6 @@ class Admin(Config):
         setTengahX = (self.parent.winfo_screenwidth()-lebar)//2
         setTengahY = (self.parent.winfo_screenheight()-tinggi)//2
         self.parent.geometry("%ix%i+%i+%i" % (lebar, tinggi, setTengahX, setTengahY))
-
         self.komponen()
 
     def komponen(self):
@@ -33,9 +32,9 @@ class Admin(Config):
         input_frame = Frame(top_level, background='#cedfe0')
         input_frame.pack(side=TOP, fill=X)
         self.frame_button = Frame(top_level, background='#cedfe0')
-        self.frame_button.pack(side=TOP, fill=X)
-        self.frame_tabel = Frame(top_level)
-        self.frame_tabel.pack(side=TOP, fill='both', expand=YES, padx=5, pady=5)
+        self.frame_button.pack(side=TOP, fill=BOTH, padx='20')
+        self.frame_tabel = Frame(top_level, background='#cedfe0')
+        self.frame_tabel.pack(fill='both', padx=5, pady=5)
         self.frame_menu = Frame(top_level, background='#cedfe0')
         self.frame_menu.pack(side=TOP, fill='y', expand=YES)
 
@@ -73,25 +72,29 @@ class Admin(Config):
 
         #button frame
         self.saveButton = Button(self.frame_button, command=self.onSave, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Simpan', width='8')
-        self.saveButton.grid(column='0', padx='30', pady='20', row='0', sticky='w')
+        self.saveButton.grid(column='0', padx='10', pady='20', row='0', sticky='w')
         self.updateButton = Button(self.frame_button, font='{Segoe UI Semibold} 10 {}', relief='groove', state='disabled', text='Update', width='8', command=self.onUpdate)
-        self.updateButton.grid(column='1', padx='30', pady='20', row='0', sticky='w')
+        self.updateButton.grid(column='1', padx='10', pady='20', row='0', sticky='w')
         self.deleteButton = Button(self.frame_button, command=self.onDelete, state='disabled', font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8')
-        self.deleteButton.grid(column='2', row='0', padx='30', pady='20', sticky='w')
+        self.deleteButton.grid(column='2', row='0', padx='10', pady='20', sticky='w')
         self.clearButton = Button(self.frame_button, font='{Segoe UI Semibold} 10 {}', command=self.onClear, relief='groove', text='Clear', width='8')
-        self.clearButton.grid(column='3', row='0', sticky='w', padx='30')
+        self.clearButton.grid(column='3', row='0', sticky='w', padx='10')
+        self.searchEntry = Entry(self.frame_button, font='{Arial} 12 {}' )
+        self.searchEntry.grid(column='4', row='0', padx='5')
+        self.searchButton = Button(self.frame_button, font='{Segoe UI Semibold} 9 {}', relief='groove', text='Cari')
+        self.searchButton.grid(column='5', row='0', sticky='e')
         self.backButton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', width='8', command=self.onKembali)
-        self.backButton.grid(column='0', row='0', padx='30', pady='10', sticky='w')
+        self.backButton.grid(column='0', row='0', padx='10', pady='10', sticky='w')
         self.changePassword = Button(input_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Ganti Password', state='disabled', command=self.onChangePassword)
         self.changePassword.grid(column='2', row='3', sticky='w')
 
         #tabel
         self.trvTabel = ttk.Treeview(self.frame_tabel, columns=judul_kolom, show='headings')
         self.trvTabel.bind("<Double-1>", self.onDoubleClick)
-        sbVer = Scrollbar(self.frame_tabel, orient='vertical', command=self.trvTabel.yview)
-        sbVer.pack(side=RIGHT, fill=BOTH)
-        self.trvTabel.pack(side=TOP, fill=BOTH, padx=10, pady=10)
-        self.trvTabel.configure(yscrollcommand=sbVer.set)
+        sbVer = Scrollbar(self.frame_tabel)
+        sbVer.pack(side=RIGHT, fill=Y)
+        self.trvTabel.pack(fill=BOTH)
+        sbVer.config(command=self.trvTabel.yview)
         self.table()
 
     def onSave(self):

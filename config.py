@@ -62,12 +62,10 @@ class Config(object):
                 cur.fetchall()
         self.__db.commit()
 
-    def insertKasus(self, tanggal, jumlah):
-        self.tanggal = tanggal
-        self.jumlah = jumlah
+    def insertKasus(self, tanggal, jumlah, username):
         cursor = self.__db.cursor()
-        value = (tanggal, jumlah)
-        cursor.execute("INSERT INTO datareal (Tanggal, Kasus) VALUES (%s, %s)", value)
+        value = (tanggal, jumlah, username)
+        cursor.execute("INSERT INTO datareal (Tanggal, Kasus, username) VALUES (%s, %s, %s)", value)
         self.__db.commit()
 
 
@@ -85,7 +83,7 @@ class Config(object):
 
     def read_positif(self):
         cur = self.__db.cursor()
-        cur.execute("SELECT datareal.Tanggal, datareal.Kasus, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id")
+        cur.execute("SELECT datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id GROUP BY Tanggal ASC")
         data_positif = cur.fetchall()
         return data_positif
 
@@ -125,7 +123,7 @@ class Config(object):
 
     def search_kasus(self, index):
         cur = self.__db.cursor()
-        sql = "SELECT datareal.Tanggal, datareal.Kasus, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id WHERE Tanggal LIKE '%{}%'".format(index)
+        sql = "SELECT datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id WHERE Tanggal LIKE '%{0}%' OR nama LIKE '%{0}%'".format(index)
         cur.execute(sql)
         search_kasus = cur.fetchall()
         return search_kasus
@@ -141,6 +139,10 @@ class Config(object):
             if cur.with_rows:
                 cur.fetchall()
         self.__db.commit()
+
+    def updateKasus(self, tanggal, kasus, userid):
+        cursor = self.__db.cursor()
+
 
     def delete(self, id):
         val = self.id = id

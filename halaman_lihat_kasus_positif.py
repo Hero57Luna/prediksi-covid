@@ -8,7 +8,7 @@ root = Tk()
 root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
-judul_kolom = ("Tanggal", "Jumlah Kasus", "Nama")
+judul_kolom = ("Tanggal", "Jumlah Kasus", "UserID", "Nama")
 
 class LihatPositif(Config):
 
@@ -40,6 +40,9 @@ class LihatPositif(Config):
         self.searchEntry.grid(column='0', row='0')
         self.searchButton = Button(self.seacrhFrame, font='{Segoe UI Semibold} 7 {}',  relief='groove', text='Cari', width='5', command=self.search)
         self.searchButton.grid(column='1', row='0', padx='5', pady='5')
+        self.resetButton = Button(self.seacrhFrame, font='{Segoe UI Semibold} 7 {}', relief='groove', text='Reset',
+                                   width='5', state='disabled', command=self.reset)
+        self.resetButton.grid(column='2', row='0', pady='5')
 
         sbVer = Scrollbar(self.frame_tabel)
         sbVer.pack(side=RIGHT, fill=Y)
@@ -68,7 +71,7 @@ class LihatPositif(Config):
         varlist["kasusTerendah"].set(self.kasus_terkecil())
 
         last_element = self.read_positif()[-1]
-        varlist["lastInput"].set(last_element[2])
+        varlist["lastInput"].set(last_element[3])
 
         self.jumlahDataEntry = Entry(self.informasi_frame, state='readonly', textvariable=varlist["jumlahData"])
         self.jumlahDataEntry.grid(column='1', row='0')
@@ -84,11 +87,12 @@ class LihatPositif(Config):
     def table(self):
         for kolom in judul_kolom:
             self.trvTabel.heading(kolom, text=kolom)
-            self.trvTabel["displaycolumns"]=("0", "1", "2")
+            self.trvTabel["displaycolumns"]=("0", "1", "3")
 
-        self.trvTabel.column("Tanggal", anchor=CENTER, width=20)
-        self.trvTabel.column("Jumlah Kasus", anchor=CENTER, width=10)
-        self.trvTabel.column("Nama", anchor=CENTER, width=70)
+        self.trvTabel.column("Tanggal", anchor=CENTER, width=110)
+        self.trvTabel.column("Jumlah Kasus", anchor=CENTER, width=90)
+        self.trvTabel.column("UserID", anchor=CENTER, width=261)
+        self.trvTabel.column("Nama", anchor=CENTER, width=261)
 
         result = self.read_positif()
 
@@ -97,14 +101,24 @@ class LihatPositif(Config):
 
     def search(self):
         searchIndex = self.searchEntry.get()
-        self.searchEntry.delete(0, END)
+        if len(searchIndex) > 0:
+            self.resetButton.config(state='normal')
+            self.searchEntry.delete(0, END)
+            for record in self.trvTabel.get_children():
+                self.trvTabel.delete(record)
+
+            result = self.search_kasus(searchIndex)
+
+            for data in result:
+                self.trvTabel.insert('', 'end', values=data)
+        else:
+            pass
+
+    def reset(self):
         for record in self.trvTabel.get_children():
             self.trvTabel.delete(record)
-
-        result = self.search_kasus(searchIndex)
-
-        for data in result:
-            self.trvTabel.insert('', 'end', values=data)
+        self.table()
+        self.resetButton.config(state='disabled')
 
 
 LihatPositif(root)

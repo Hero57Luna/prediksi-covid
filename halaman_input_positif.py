@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk, messagebox
+import mysql.connector
 import os
 from config import Config
 import datetime
@@ -8,7 +9,7 @@ root = Tk()
 root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
-judul_kolom = ("Tanggal", "Kasus", "Username")
+judul_kolom = ("Tanggal", "Kasus", "UserID", "Nama")
 
 class InputPositif(Config):
 
@@ -29,19 +30,19 @@ class InputPositif(Config):
         self.header_frame = Frame(self.top_level, background='#808080', padx='10', pady='20')
         self.header_frame.pack(side='top', fill='x', anchor='center')
         self.input_frame = Frame(self.top_level, background='#cedfe0')
-        self.input_frame.pack(side='top')
-        self.frame_tabel = Frame(self.top_level)
-        self.frame_tabel.pack(side=TOP, fill='both', expand='yes', padx='10', pady='10')
+        self.input_frame.pack(side='top', fill='x')
         self.button_frame = Frame(self.top_level, background='#cedfe0', pady='10')
-        self.button_frame.pack(side='top')
+        self.button_frame.pack(side='top', fill='both', padx='20')
+        self.frame_tabel = Frame(self.top_level, background='#cedfe0')
+        self.frame_tabel.pack(fill='both', padx='10', pady='10')
 
         #label
         self.header_label = Label(self.header_frame, background='#808080', text='Halaman Input Kasus Positif', font='{Segoe UI Semibold} 14 {}')
         self.header_label.pack(side='top')
-        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Tanggal').grid(column='0', padx='10', pady='20', row='0', sticky='w')
-        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='(YYYY-MM-DD)').grid(column='2', row='0', sticky='w')
-        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Jumlah Kasus').grid(row='2', column='0', padx='10', pady='20', sticky='w')
-        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Username Anda').grid(column='0', row='3', padx='10', pady='20')
+        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Tanggal').grid(column='0', padx='30', pady='5', row='0', sticky='w')
+        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='(YYYY-MM-DD)').grid(column='2', row='0', sticky='w', padx='30', pady='5')
+        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Jumlah Kasus').grid(row='2', column='0', padx='30', pady='5', sticky='w')
+        Label(self.input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='ID Anda').grid(column='0', row='3', padx='30', pady='5', sticky='w')
 
         #entry field
         self.entryTanggal = Entry(self.input_frame)
@@ -52,23 +53,26 @@ class InputPositif(Config):
         self.entryUsername.grid(row='3', column='1')
 
         #tabel
-        self.trvTabel = ttk.Treeview(self.frame_tabel, columns=judul_kolom, show='headings')
-        self.trvTabel.bind("<Double-1>")
-        sbVer = Scrollbar(self.frame_tabel, orient='vertical', command=self.trvTabel.yview)
-        sbVer.pack(side=RIGHT, fill=BOTH)
-        self.trvTabel.pack(side=TOP, fill=BOTH, padx=10, pady=10)
-        self.trvTabel.configure(yscrollcommand=sbVer.set)
+        sbVer = Scrollbar(self.frame_tabel)
+        sbVer.pack(side=RIGHT, fill=Y)
+        self.trvTabel = ttk.Treeview(self.frame_tabel, yscrollcommand=sbVer.set, columns=judul_kolom, show='headings')
+        self.trvTabel.bind("<Double-1>", self.onDoubleClick)
+        self.trvTabel.pack(fill=BOTH)
+        sbVer.config(command=self.trvTabel.yview)
         self.table()
 
         #button
-        self.saveButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Go!', command=self.onSave)
-        self.saveButton.grid(row='0', column='1', padx='10', pady='10')
-        self.kembaliButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', command=self.onKembali, width='8')
-        self.kembaliButton.grid(row='0', column='0', padx='10', pady='10')
+        self.saveButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Simpan', command=self.onSave, width='8')
+        self.saveButton.grid(row='0', column='0', padx='5', pady='10', sticky='w')
+        self.updateButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Update', width='8')
+        self.updateButton.grid(row='0', column='1', padx='5', pady='10', sticky='w')
+        self.deleteButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8')
+        self.deleteButton.grid(row='0', column='2', padx='5', pady='10', sticky='w')
 
     def onSave(self):
         entTanggal = self.entryTanggal.get()
         entKasus = self.entryKasus.get()
+        entUsername = self.entryUsername.get()
         #konversi tanggal dan kasus
         tanggalString = str(entTanggal)
         format = "%Y-%m-%d"
@@ -81,9 +85,17 @@ class InputPositif(Config):
                         datetime.datetime.strptime(tanggalString, format)
                         konfirmasi = messagebox.askquestion(title='Konfirmasi', message='Tanggal {} dengan kasus {} orang \n Apkah sudah benar?'.format(entTanggal, entKasus))
                         if konfirmasi == 'yes':
-                            self.insertKasus(entTanggal, kasusInt)
-                            self.onClear()
-                            messagebox.showinfo(title='Sukses', message='Data berhasil dimasukkan')
+                            try:
+                                self.insertKasus(entTanggal, kasusInt, entUsername)
+                                self.onClear()
+                                messagebox.showinfo(title='Sukses', message='Data berhasil dimasukkan')
+                                self.trvTabel.delete(*self.trvTabel.get_children())
+                                self.frame_tabel.after(0, self.table())
+                            except mysql.connector.errors.IntegrityError as e:
+                                if e.errno == 1062:
+                                    messagebox.showerror(title="Error", message="Tanggal {} sudah ada".format(entTanggal))
+                                elif e.errno == 1452:
+                                    messagebox.showerror(title="Error", message="User tidak terdaftar")
                         else:
                             pass
                     except ValueError:
@@ -98,20 +110,32 @@ class InputPositif(Config):
     def table(self):
         for kolom in judul_kolom:
             self.trvTabel.heading(kolom, text=kolom)
-            self.trvTabel["displaycolumns"]=("0", "1", "2")
+            self.trvTabel["displaycolumns"]=("0", "1", "3")
 
-        self.trvTabel.column("Tanggal", anchor=CENTER, width=30)
-        self.trvTabel.column("Kasus", anchor=CENTER, width=20)
-        self.trvTabel.column("Username", anchor=CENTER, width=90)
+        self.trvTabel.column("Tanggal", anchor=CENTER, width=110, stretch=NO)
+        self.trvTabel.column("Kasus", anchor=CENTER, width=90, stretch=NO)
+        self.trvTabel.column("UserID", anchor=CENTER, width=261, stretch=NO)
+        self.trvTabel.column("Nama", anchor=CENTER, width=261, stretch=NO)
 
-        result = self.read_kasus()
+        result = self.read_positif()
 
         for data in result:
             self.trvTabel.insert('', 'end', values=data)
 
+    def onDoubleClick(self, event):
+        self.onClear()
+
+        selected = self.trvTabel.focus()
+        item = self.trvTabel.item(selected, "values")
+
+        self.entryTanggal.insert(END, item[0])
+        self.entryKasus.insert(END, item[1])
+        self.entryUsername.insert(END, item[2])
+
     def onClear(self):
         self.entryTanggal.delete(0, END)
         self.entryKasus.delete(0, END)
+        self.entryUsername.delete(0, END)
 
     def onKembali(self):
         root.destroy()
