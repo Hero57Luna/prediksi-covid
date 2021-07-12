@@ -10,7 +10,7 @@ class UtamaAdmin:
     def __init__(self, toplevel):
         self.toplevel = toplevel
         lebar = 600
-        tinggi = 500
+        tinggi = 400
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
         setTengahY = (self.toplevel.winfo_screenheight() - tinggi) // 2
         self.toplevel.geometry("%ix%i+%i+%i" % (lebar, tinggi, setTengahX, setTengahY))
@@ -31,22 +31,16 @@ class UtamaAdmin:
         #button
         self.buttonKelola = Button(self.button_frame, text='Kelolah Pengguna', width='30', font='{Segoe UI Semibold} 12 {}', command=self.KelolaPengguna)
         self.buttonKelola.grid(column='0', row='0', pady='30')
-        self.buttonInputData = Button(self.button_frame, text='Input Data Kasus Positif', width='30', font='{Segoe UI Semibold} 12 {}', command=self.InputDataPositif)
-        self.buttonInputData.grid(column='0', row='1', pady='30')
-        self.buttonPrediksi = Button(self.button_frame, text='Lakukan Prediksi Data', width='30', font='{Segoe UI Semibold} 12 {}', command=self.PrediksiData)
-        self.buttonPrediksi.grid(column='0', row='2', pady='30')
+        self.lihatDataPositif = Button(self.button_frame, text='Lihat Kasus Positif COVID-19', width='30', font='{Segoe UI Semibold} 12 {}', command=self.lihatDataPositif)
+        self.lihatDataPositif.grid(column='0', row='1', pady='30')
 
     def KelolaPengguna(self):
         root.destroy()
         os.system('admin.py')
 
-    def InputDataPositif(self):
+    def lihatDataPositif(self):
         root.destroy()
-        os.system('halaman_input_positif.py')
-
-    def PrediksiData(self):
-        root.destroy()
-        os.system('peramalan.py')
+        os.system('halaman_lihat_kasus_positif.py')
 
 UtamaAdmin(root)
 root.mainloop()

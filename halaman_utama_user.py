@@ -28,15 +28,27 @@ class UtamaUser:
         self.header_label = Label(self.header_frame, background='#808080', text='Halo! Selamat Datang User',
                                   font='{Segoe UI Semibold} 14 {}').pack(side='top')
 
-        self.buttonKelola = Button(self.button_frame, text='Lihat Data Kasus Positif', width='30',
-                                   font='{Segoe UI Semibold} 12 {}')
-        self.buttonKelola.grid(column='0', row='0', pady='30')
+        self.buttonLihatKasus = Button(self.button_frame, text='Lihat Data Kasus Positif', width='30',
+                                   font='{Segoe UI Semibold} 12 {}', command=self.lihatKasus)
+        self.buttonLihatKasus.grid(column='0', row='0', pady='30')
         self.buttonInputData = Button(self.button_frame, text='Input Data Kasus Positif', width='30',
-                                      font='{Segoe UI Semibold} 12 {}')
+                                      font='{Segoe UI Semibold} 12 {}', command=self.inputPositif)
         self.buttonInputData.grid(column='0', row='1', pady='30')
         self.buttonPrediksi = Button(self.button_frame, text='Lakukan Prediksi Data', width='30',
-                                     font='{Segoe UI Semibold} 12 {}')
+                                     font='{Segoe UI Semibold} 12 {}', command=self.prediksiKasus)
         self.buttonPrediksi.grid(column='0', row='2', pady='30')
+
+    def lihatKasus(self):
+        root.destroy()
+        os.system('halaman_lihat_kasus_positif.py')
+
+    def inputPositif(self):
+        root.destroy()
+        os.system('halaman_input_positif.py')
+
+    def prediksiKasus(self):
+        root.destroy()
+        os.system('peramalan.py')
 
 UtamaUser(root)
 root.mainloop()

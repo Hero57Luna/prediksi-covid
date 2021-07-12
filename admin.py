@@ -9,7 +9,7 @@ root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
 # config = Config()
-judul_kolom = ("ID", "Nama", "Telepon", "Username", "Password", "Role")
+judul_kolom = ("ID", "Nama", "Telepon", "Username", "Password", "Role", "UserDelete", "Status")
 optionlist = ["ADM", "USR"]
 
 
@@ -17,7 +17,7 @@ class Admin(Config):
     def __init__(self, parent):
         super(Admin, self).__init__()
         self.parent = parent
-        lebar = 700
+        lebar = 780
         tinggi = 705
         setTengahX = (self.parent.winfo_screenwidth()-lebar)//2
         setTengahY = (self.parent.winfo_screenheight()-tinggi)//2
@@ -26,17 +26,17 @@ class Admin(Config):
 
     def komponen(self):
         #atur frame
-        top_level = Frame(self.parent, background='#cedfe0')
-        top_level.pack(side=TOP, fill=BOTH)
-        Label(top_level, background='#808080', font='{Segoe UI Semibold} 14 {}', text='Halaman Kelola Pengguna', padx='10', pady='20').pack(fill='x', side='top')
-        input_frame = Frame(top_level, background='#cedfe0')
+        self.top_level = Frame(self.parent, background='#cedfe0')
+        self.top_level.pack(side=TOP, fill=BOTH)
+        Label(self.top_level, background='#808080', font='{Segoe UI Semibold} 14 {}', text='Halaman Kelola Pengguna', padx='10', pady='20').pack(fill='x', side='top')
+        input_frame = Frame(self.top_level, background='#cedfe0')
         input_frame.pack(side=TOP, fill=X)
-        self.frame_button = Frame(top_level, background='#cedfe0')
+        self.frame_button = Frame(self.top_level, background='#cedfe0')
         self.frame_button.pack(side=TOP, fill=BOTH, padx='20')
-        self.frame_tabel = Frame(top_level, background='#cedfe0')
+        self.frame_tabel = Frame(self.top_level, background='#cedfe0')
         self.frame_tabel.pack(fill='both', padx=5, pady=5)
-        self.frame_menu = Frame(top_level, background='#cedfe0')
-        self.frame_menu.pack(side=TOP, fill='y', expand=YES)
+        self.frame_menu = Frame(self.top_level, background='#cedfe0')
+        self.frame_menu.pack(side=TOP, fill='y', pady='20')
 
         #input frame_label
         Label(input_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Kode').grid(column='0', padx='30', pady='5', row='0', sticky='w')
@@ -68,6 +68,8 @@ class Admin(Config):
         self.inputUsername.grid(column='1', padx='20', row='5', sticky='w')
         self.inputRole = OptionMenu(input_frame, self.value_inside, *optionlist)
         self.inputRole.grid(column='1', padx='20', row='6', sticky='w')
+        self.searchEntry = Entry(self.frame_button, font='{Calibri} 13 {}')
+        self.searchEntry.grid(column='5', row='0', padx='5')
 
 
         #button frame
@@ -77,14 +79,14 @@ class Admin(Config):
         self.updateButton.grid(column='1', padx='10', pady='20', row='0', sticky='w')
         self.deleteButton = Button(self.frame_button, command=self.onDelete, state='disabled', font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8')
         self.deleteButton.grid(column='2', row='0', padx='10', pady='20', sticky='w')
+        self.activateUser = Button(self.frame_button, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Aktifkan User', width='13', command=self.onActivateUser, state='disabled')
+        self.activateUser.grid(column='3', row='0')
         self.clearButton = Button(self.frame_button, font='{Segoe UI Semibold} 10 {}', command=self.onClear, relief='groove', text='Clear', width='8')
-        self.clearButton.grid(column='3', row='0', sticky='w', padx='10')
-        self.searchEntry = Entry(self.frame_button, font='{Arial} 12 {}' )
-        self.searchEntry.grid(column='4', row='0', padx='5')
-        self.searchButton = Button(self.frame_button, font='{Segoe UI Semibold} 9 {}', relief='groove', text='Cari')
-        self.searchButton.grid(column='5', row='0', sticky='e')
+        self.clearButton.grid(column='4', row='0', sticky='w', padx='10')
+        self.searchButton = Button(self.frame_button, font='{Segoe UI Semibold} 9 {}', relief='groove', text='Cari', command=self.onSearch)
+        self.searchButton.grid(column='6', row='0', sticky='e')
         self.backButton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', width='8', command=self.onKembali)
-        self.backButton.grid(column='0', row='0', padx='10', pady='10', sticky='w')
+        self.backButton.grid(column='0', row='0', padx='10')
         self.changePassword = Button(input_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Ganti Password', state='disabled', command=self.onChangePassword)
         self.changePassword.grid(column='2', row='3', sticky='w')
 
@@ -145,7 +147,7 @@ class Admin(Config):
         if konfirmasi_hapus == 'yes':
             selected_item = self.trvTabel.selection()[0]
             get_id = self.trvTabel.item(selected_item)['values'][0]
-            self.delete(get_id)
+            self.deactivate_user(get_id)
             self.trvTabel.delete(*self.trvTabel.get_children())
             self.frame_tabel.after(0, self.table())
             self.onClear()
@@ -194,10 +196,31 @@ class Admin(Config):
                     self.onClear()
                     break
 
+    def onActivateUser(self):
+        selected_item = self.trvTabel.selection()[0]
+        get_id = self.trvTabel.item(selected_item)['values'][0]
+        self.activate_user(get_id)
+        self.trvTabel.delete(*self.trvTabel.get_children())
+        self.frame_tabel.after(0, self.table())
+
+    def onSearch(self):
+        searchIndex = self.searchEntry.get()
+        if len(searchIndex) > 0:
+            self.searchEntry.delete(0, END)
+            for record in self.trvTabel.get_children():
+                self.trvTabel.delete(record)
+
+            result = self.search_user(searchIndex)
+
+            for data in result:
+                self.trvTabel.insert('', 'end', values=data)
+        else:
+           pass
+
     def table(self):
         for kolom in judul_kolom:
             self.trvTabel.heading(kolom, text=kolom)
-            self.trvTabel["displaycolumns"]=("0", "1", "2", "3", "5")
+            self.trvTabel["displaycolumns"]=("0", "1", "2", "3", "5", "7")
 
         self.trvTabel.column("ID", anchor=CENTER,width=50, stretch=NO)
         self.trvTabel.column("Nama", width=205, stretch=NO)
@@ -205,6 +228,8 @@ class Admin(Config):
         self.trvTabel.column("Password", width=100, stretch=NO)
         self.trvTabel.column("Username", width=150, stretch=NO)
         self.trvTabel.column("Role", anchor=CENTER, width=96, stretch=NO)
+        self.trvTabel.column("UserDelete", width=100, stretch=NO)
+        self.trvTabel.column("Status", width=100, stretch=NO)
 
         user_result = self.read_user()
         i=0
@@ -253,6 +278,7 @@ class Admin(Config):
 
         selected = self.trvTabel.focus()
         item = self.trvTabel.item(selected, "values")
+        user_status = []
 
         self.inputKode.config(state="normal")
         self.inputKode.insert(END, item[0])
@@ -264,6 +290,11 @@ class Admin(Config):
         self.inputPassword.config(state='readonly')
         self.value_inside.set(item[5])
         self.changePassword.config(state='normal')
+        user_status.insert(0, item[6])
+        if user_status[0] == 'None':
+            self.activateUser.config(state='disabled')
+        else:
+            self.activateUser.config(state='normal')
 
 
 Admin(root)

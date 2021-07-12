@@ -89,9 +89,12 @@ class Config(object):
 
     def read_user(self):
         cur = self.__db.cursor()
-        cur.execute("SELECT user.id, user.nama, user.telepon, login.username, login.password, user.role "
-                    "FROM user "
-                    "INNER JOIN login ON user.id=login.id_user")
+        cur.execute("SELECT user.id, user.nama, user.telepon, login.username, "
+                    "login.password, user.role, user.user_delete,"
+                    "CASE WHEN user.user_delete IS NULL THEN 'User Aktif'"
+                    "ELSE 'User Tidak Aktif'"
+                    "END AS StatusKaryawan "
+                    "FROM user INNER JOIN login ON user.id=login.id_user;")
         data_user = cur.fetchall()
         return data_user
 
@@ -128,6 +131,21 @@ class Config(object):
         search_kasus = cur.fetchall()
         return search_kasus
 
+    def search_user(self, index):
+        cur = self.__db.cursor()
+        sql = "SELECT user.id, user.nama, user.telepon, login.username, login.password, user.role, user.user_delete, " \
+              "CASE WHEN user.user_delete IS NULL THEN 'User Aktif' ELSE 'User Tidak Aktif' " \
+              "END AS StatusKaryawan " \
+              "FROM user INNER JOIN login ON user.id=login.id_user " \
+              "WHERE user.id LIKE '{0}' " \
+              "OR user.nama LIKE '%{0}%' " \
+              "OR login.username LIKE '%{0}%' " \
+              "OR user.telepon LIKE '%{0}%'" \
+              "OR user.role LIKE '%{0}%'".format(index)
+        cur.execute(sql)
+        search_user = cur.fetchall()
+        return search_user
+
     def update(self, nama, telepon, role, username, password, id):
         cursor = self.__db.cursor(buffered=True)
         val = (nama, telepon, role, username, password, id)
@@ -149,6 +167,18 @@ class Config(object):
         cur = self.__db.cursor()
         sql = "DELETE FROM user WHERE id = %s"
         cur.execute(sql, (val,))
+        self.__db.commit()
+
+    def deactivate_user(self, id):
+        cur = self.__db.cursor()
+        sql = "UPDATE user SET user_delete = now() WHERE id = {}".format(id)
+        cur.execute(sql)
+        self.__db.commit()
+
+    def activate_user(self, id):
+        cur = self.__db.cursor()
+        sql = "UPDATE user SET user_delete = NULL WHERE id = {}".format(id)
+        cur.execute(sql)
         self.__db.commit()
 
     def GenerateCSVDataReal(self):

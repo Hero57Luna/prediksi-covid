@@ -60,15 +60,21 @@ class Login(Config):
             cursor.execute(sql)
             results = cursor.fetchone()
             if results:
-                user_query = "SELECT role FROM user WHERE id = {}".format(results[0])
+                user_query = "SELECT role, user_delete FROM user WHERE id = {}".format(results[0])
                 cursor.execute(user_query)
                 hasil_user = cursor.fetchone()
                 if hasil_user[0] == 'ADM':
-                    root.destroy()
-                    os.system('halaman_utama_admin.py')
+                   if str(hasil_user[1]) == 'None':
+                       root.destroy()
+                       os.system('halaman_utama_admin.py')
+                   else:
+                       messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
                 elif hasil_user[0] == 'USR':
-                    root.destroy()
-                    os.system('halaman_utama_user.py')
+                    if str(hasil_user[1]) == 'None':
+                        root.destroy()
+                        os.system('halaman_utama_user.py')
+                    else:
+                        messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
             else:
                 messagebox.showerror(title='Error', message='Username atau Password Anda salah')
         else:
