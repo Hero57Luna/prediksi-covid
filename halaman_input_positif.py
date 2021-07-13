@@ -9,7 +9,7 @@ root = Tk()
 root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
-judul_kolom = ("Tanggal", "Kasus", "UserID", "Nama")
+judul_kolom = ("ID", "Tanggal", "Kasus", "UserID", "Nama")
 
 class InputPositif(Config):
 
@@ -17,7 +17,7 @@ class InputPositif(Config):
         super(InputPositif, self).__init__()
         self.toplevel = toplevel
         lebar = 500
-        tinggi = 600
+        tinggi = 550
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
         setTengahY = (self.toplevel.winfo_screenheight() - tinggi) // 2
         self.toplevel.geometry("%ix%i+%i+%i" % (lebar, tinggi, setTengahX, setTengahY))
@@ -35,6 +35,8 @@ class InputPositif(Config):
         self.button_frame.pack(side='top', fill='both', padx='20')
         self.frame_tabel = Frame(self.top_level, background='#cedfe0')
         self.frame_tabel.pack(fill='both', padx='10', pady='10')
+        self.frame_menu = Frame(self.top_level, background='#cedfe0')
+        self.frame_menu.pack(fill='both')
 
         #label
         self.header_label = Label(self.header_frame, background='#808080', text='Halaman Input Kasus Positif', font='{Segoe UI Semibold} 14 {}')
@@ -64,10 +66,12 @@ class InputPositif(Config):
         #button
         self.saveButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Simpan', command=self.onSave, width='8')
         self.saveButton.grid(row='0', column='0', padx='5', pady='10', sticky='w')
-        self.updateButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Update', width='8')
+        self.updateButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Update', width='8', command=self.onUpdate, state='disabled')
         self.updateButton.grid(row='0', column='1', padx='5', pady='10', sticky='w')
-        self.deleteButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8')
+        self.deleteButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8', command=self.onDelete, state='disabled')
         self.deleteButton.grid(row='0', column='2', padx='5', pady='10', sticky='w')
+        self.backbutton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', width='8', command=self.onKembali)
+        self.backbutton.pack()
 
     def onSave(self):
         entTanggal = self.entryTanggal.get()
@@ -79,7 +83,7 @@ class InputPositif(Config):
 
         if len(entTanggal or entKasus) > 0 :
             if len(entTanggal) > 0 :
-                if len(entKasus) > 0 :
+                if len(entUsername) > 0 :
                     try:
                         kasusInt = int(entKasus)
                         datetime.datetime.strptime(tanggalString, format)
@@ -107,30 +111,86 @@ class InputPositif(Config):
         else:
             messagebox.showerror(title='Error', message='Field tidak boleh kosong')
 
+    def onUpdate(self):
+        entTanggal = self.entryTanggal.get()
+        entKasus = self.entryKasus.get()
+        entUsername = self.entryUsername.get()
+        tanggalString = str(entTanggal)
+        format = "%Y-%m-%d"
+
+        if len(entTanggal) > 0:
+            if len(entKasus) > 0:
+                if len(entUsername) > 0:
+                    try:
+                        kasusInt = int(entKasus)
+                        datetime.datetime.strptime(tanggalString, format)
+                        konfirmasi = messagebox.askquestion(title='Konfirmasi',
+                                                            message='Tanggal {} dengan kasus {} orang \n Apkah sudah benar?'.format(
+                                                                entTanggal, entKasus))
+                        if konfirmasi == 'yes':
+                            try:
+                                self.updateKasus(entTanggal, kasusInt, entUsername, kasus_id[0])
+                                self.onClear()
+                                messagebox.showinfo(title='Sukses', message='Data berhasil dimasukkan')
+                                self.trvTabel.delete(*self.trvTabel.get_children())
+                                self.frame_tabel.after(0, self.table())
+                            except mysql.connector.errors.IntegrityError as e:
+                                if e.errno == 1452:
+                                    messagebox.showerror(title="Error", message='User tidak terdaftar')
+                    except ValueError:
+                        messagebox.showerror(title='Error', message='Mohon cek kembali format tanggal dan kasus')
+                else:
+                    print('masukkan username')
+            else:
+                print('masukkan kasus')
+        else:
+            print('masukkan tanggal')
+
+    def onDelete(self):
+        konfirmasi_hapus = messagebox.askquestion(title='Konfirmasi Hapus', message='Apakah Anda yakin ingin menghapus?', icon='warning')
+        if konfirmasi_hapus == 'yes':
+            selected_item = self.trvTabel.selection()[0]
+            get_id = self.trvTabel.item(selected_item)['values'][0]
+            self.deletekasus(get_id)
+            self.trvTabel.delete(*self.trvTabel.get_children())
+            self.frame_tabel.after(0, self.table())
+            self.onClear()
+        else:
+            pass
+
     def table(self):
         for kolom in judul_kolom:
             self.trvTabel.heading(kolom, text=kolom)
-            self.trvTabel["displaycolumns"]=("0", "1", "3")
+            self.trvTabel["displaycolumns"]=("1", "2", "4")
 
+        self.trvTabel.column("ID", anchor=CENTER, width=110, stretch=NO)
         self.trvTabel.column("Tanggal", anchor=CENTER, width=110, stretch=NO)
         self.trvTabel.column("Kasus", anchor=CENTER, width=90, stretch=NO)
         self.trvTabel.column("UserID", anchor=CENTER, width=261, stretch=NO)
         self.trvTabel.column("Nama", anchor=CENTER, width=261, stretch=NO)
 
-        result = self.read_positif()
+        result = self.read_kasus()
 
         for data in result:
             self.trvTabel.insert('', 'end', values=data)
 
     def onDoubleClick(self, event):
+        global kasus_id
+
         self.onClear()
 
         selected = self.trvTabel.focus()
         item = self.trvTabel.item(selected, "values")
 
-        self.entryTanggal.insert(END, item[0])
-        self.entryKasus.insert(END, item[1])
-        self.entryUsername.insert(END, item[2])
+        self.entryTanggal.insert(END, item[1])
+        self.entryKasus.insert(END, item[2])
+        self.entryUsername.insert(END, item[3])
+        self.updateButton.config(state='normal')
+        self.deleteButton.config(state='normal')
+        self.saveButton.config(state='disabled')
+        kasus_id = []
+        kasus_id.insert(0, item[0])
+
 
     def onClear(self):
         self.entryTanggal.delete(0, END)
@@ -139,7 +199,7 @@ class InputPositif(Config):
 
     def onKembali(self):
         root.destroy()
-        os.system('halaman_utama_admin.py')
+        os.system('halaman_utama_user.py')
 
 InputPositif(root)
 root.mainloop()

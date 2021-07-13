@@ -77,7 +77,7 @@ class Config(object):
 
     def read_kasus(self):
         cur = self.__db.cursor()
-        cur.execute("SELECT Tanggal, Kasus, username FROM datareal")
+        cur.execute("SELECT datareal.id, datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id GROUP BY Tanggal ASC")
         data_kasus = cur.fetchall()
         return data_kasus
 
@@ -158,8 +158,11 @@ class Config(object):
                 cur.fetchall()
         self.__db.commit()
 
-    def updateKasus(self, tanggal, kasus, userid):
+    def updateKasus(self, tanggal, kasus, username, userid):
         cursor = self.__db.cursor()
+        sql = "UPDATE datareal SET Tanggal = '{0}', Kasus = {1}, username = {2} WHERE id = {3}".format(tanggal, kasus, username, userid)
+        cursor.execute(sql)
+        self.__db.commit()
 
 
     def delete(self, id):
@@ -167,6 +170,12 @@ class Config(object):
         cur = self.__db.cursor()
         sql = "DELETE FROM user WHERE id = %s"
         cur.execute(sql, (val,))
+        self.__db.commit()
+
+    def deletekasus(self, id):
+        cur = self.__db.cursor()
+        sql = "DELETE FROM datareal WHERE id = {}".format(id)
+        cur.execute(sql)
         self.__db.commit()
 
     def deactivate_user(self, id):
