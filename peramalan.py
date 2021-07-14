@@ -63,7 +63,7 @@ class Peramalan(Config):
 
     def onKembali(self):
         root.destroy()
-        os.system('halaman_utama_admin.py')
+        os.system('halaman_utama_user.py')
 
     def onGenerateCSV(self):
        self.GenerateAllData()
