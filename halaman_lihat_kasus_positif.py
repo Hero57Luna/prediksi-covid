@@ -32,7 +32,9 @@ class LihatPositif(Config):
         self.frame_tabel = Frame(self.top_level, background='#cedfe0')
         self.frame_tabel.pack(padx='10', fill=BOTH)
         self.informasi_frame = Frame(self.top_level, background='#cedfe0')
-        self.informasi_frame.pack(side='top', expand='yes', fill='both', pady='10', padx='10')
+        self.informasi_frame.pack(side='top', fill='both', padx='10')
+        self.frame_menu = Frame(self.top_level, background='#cedfe0')
+        self.frame_menu.pack(fill='both')
 
         Label(self.header_frame, background='#808080', text='Halaman Informasi Kasus Positif', font='{Segoe UI Semibold} 14 {}').pack()
 
@@ -43,6 +45,8 @@ class LihatPositif(Config):
         self.resetButton = Button(self.seacrhFrame, font='{Segoe UI Semibold} 7 {}', relief='groove', text='Reset',
                                    width='5', state='disabled', command=self.reset)
         self.resetButton.grid(column='2', row='0', pady='5')
+        self.backButton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}',  relief='groove', text='Kembali', command=self.onKembali)
+        self.backButton.pack(fill='y', pady='20')
 
         sbVer = Scrollbar(self.frame_tabel)
         sbVer.pack(side=RIGHT, fill=Y)
@@ -64,6 +68,7 @@ class LihatPositif(Config):
         Label(self.informasi_frame, background='#cedfe0', font='{Segoe UI Semibold} 12 {}', text='Jumlah kasus terendah').grid(
             column='0', row='4', sticky='w')
 
+        # assign multiple variable into StringVar at once
         varlist = {var: StringVar() for var in ["jumlahData", "totalKasus", "lastInput", "kasusTertinggi", "kasusTerendah"]}
         varlist["jumlahData"].set(self.read_jumlah_data())
         varlist["totalKasus"].set(self.read_total_kasus())
@@ -119,6 +124,10 @@ class LihatPositif(Config):
             self.trvTabel.delete(record)
         self.table()
         self.resetButton.config(state='disabled')
+
+    def onKembali(self):
+        root.destroy()
+        os.system('halaman_utama_user.py')
 
 
 LihatPositif(root)

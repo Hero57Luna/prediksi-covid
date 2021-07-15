@@ -8,6 +8,8 @@ from pathlib import Path
 
 class Config(object):
 
+    # this is the database connection configuration
+
     def __init__(self):
         self.__host = "localhost"
         self.__username = "root"
@@ -44,6 +46,9 @@ class Config(object):
             print("Sambungan gagal")
             exit(1)
 
+    # end for database connection block
+
+    # create is used for the purpose of data insert for pengguna
     def create(self, nama, telepon, role, username, password):
         self.nama = nama
         self.telepon = telepon
@@ -67,14 +72,11 @@ class Config(object):
         value = (tanggal, jumlah, username)
         cursor.execute("INSERT INTO datareal (Tanggal, Kasus, username) VALUES (%s, %s, %s)", value)
         self.__db.commit()
+    # end for insertion
 
-
-    def read_login(self):
-        cur = self.__db.cursor()
-        cur.execute("SELECT username FROM login")
-        data_user = cur.fetchall()
-        return data_user
-
+    # read_kasus is used in the halaman input positif
+    # the difference between read_kasus vs read_positif are as follows:
+    # read_kasus needs the datareal id for CUD operation whereas read_positif isn't
     def read_kasus(self):
         cur = self.__db.cursor()
         cur.execute("SELECT datareal.id, datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id GROUP BY Tanggal ASC")
@@ -87,6 +89,8 @@ class Config(object):
         data_positif = cur.fetchall()
         return data_positif
 
+    # the blocks below are used for the purpose of read
+    # rad_user is used for well you guessed it, read the user(user, admin)
     def read_user(self):
         cur = self.__db.cursor()
         cur.execute("SELECT user.id, user.nama, user.telepon, login.username, "
@@ -124,6 +128,9 @@ class Config(object):
         total_kasus = cur.fetchall()
         return total_kasus
 
+    # end for read
+
+    # below are the search queries, it has the same sql as read but has the where clause
     def search_kasus(self, index):
         cur = self.__db.cursor()
         sql = "SELECT datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id WHERE Tanggal LIKE '%{0}%' OR nama LIKE '%{0}%'".format(index)
@@ -145,7 +152,9 @@ class Config(object):
         cur.execute(sql)
         search_user = cur.fetchall()
         return search_user
+    # end for search
 
+    # below are update sql for kelola pengguna and kasus respectively
     def update(self, nama, telepon, role, username, password, id):
         cursor = self.__db.cursor(buffered=True)
         val = (nama, telepon, role, username, password, id)
@@ -163,8 +172,9 @@ class Config(object):
         sql = "UPDATE datareal SET Tanggal = '{0}', Kasus = {1}, username = {2} WHERE id = {3}".format(tanggal, kasus, username, userid)
         cursor.execute(sql)
         self.__db.commit()
+    # end for update
 
-
+    # below are delete queries for both kelola pengguna and kasus respectively
     def delete(self, id):
         val = self.id = id
         cur = self.__db.cursor()
@@ -178,20 +188,22 @@ class Config(object):
         cur.execute(sql)
         self.__db.commit()
 
+    # deactivate_user are used for kelola pengguna, in which it doesn't delete the user, but instead soft delete
     def deactivate_user(self, id):
         cur = self.__db.cursor()
         sql = "UPDATE user SET user_delete = now() WHERE id = {}".format(id)
         cur.execute(sql)
         self.__db.commit()
 
+    # reactivate user
     def activate_user(self, id):
         cur = self.__db.cursor()
         sql = "UPDATE user SET user_delete = NULL WHERE id = {}".format(id)
         cur.execute(sql)
         self.__db.commit()
 
+    # generate the necessary files for forecasting to work
     def GenerateCSVDataReal(self):
-        #export untuk datareal
         exported_path = Path('.').absolute() / 'exported' / 'Positif.csv'
         target = '%r'%str(exported_path)
 
@@ -227,7 +239,7 @@ class Config(object):
         query = "SELECT 'Tanggal','Kasus' "\
                 "UNION " \
                 "SELECT DATE_FORMAT(Tanggal, '%d-%b-%Y'), " \
-                "Kasus FROM datareal WHERE Tanggal >= '2021-02-24' AND Tanggal <= '2021-05-08' " \
+                "Kasus FROM datareal WHERE Tanggal >= '2021-02-24' " \
                 "INTO OUTFILE {} " \
                 "FIELDS TERMINATED BY ',' " \
                 "LINES TERMINATED BY '\n' ".format(target)
@@ -249,7 +261,9 @@ class Config(object):
                    os.remove(f)
             else:
                 pass
+    # end for generate csv
 
+    # this function is used to change password on the kelola pengguna
     def changePassword(self, password, id):
         cursor = self.__db.cursor()
         sql = "UPDATE login SET password = '{}' WHERE id_user = {}".format(password, id)

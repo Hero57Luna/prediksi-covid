@@ -51,6 +51,7 @@ class GantiPassword(Config):
         self.kembaliButton = Button(button_frame, font='{Segoe UI Semibold} 10 {}', text='Kembali', command=self.onKembali)
         self.kembaliButton.grid(column='1', row='0')
 
+
     def onKembali(self):
         root.destroy()
         os.system('admin.py')

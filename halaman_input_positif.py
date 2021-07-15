@@ -70,6 +70,8 @@ class InputPositif(Config):
         self.updateButton.grid(row='0', column='1', padx='5', pady='10', sticky='w')
         self.deleteButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Hapus', width='8', command=self.onDelete, state='disabled')
         self.deleteButton.grid(row='0', column='2', padx='5', pady='10', sticky='w')
+        self.clearButton = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Clear', width='8', command=self.onClear)
+        self.clearButton.grid(row='0', column='3', padx='5', pady='10', sticky='w')
         self.backbutton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', width='8', command=self.onKembali)
         self.backbutton.pack()
 
@@ -77,6 +79,7 @@ class InputPositif(Config):
         entTanggal = self.entryTanggal.get()
         entKasus = self.entryKasus.get()
         entUsername = self.entryUsername.get()
+
         #konversi tanggal dan kasus
         tanggalString = str(entTanggal)
         format = "%Y-%m-%d"
@@ -177,8 +180,6 @@ class InputPositif(Config):
     def onDoubleClick(self, event):
         global kasus_id
 
-        self.onClear()
-
         selected = self.trvTabel.focus()
         item = self.trvTabel.item(selected, "values")
 
@@ -188,14 +189,21 @@ class InputPositif(Config):
         self.updateButton.config(state='normal')
         self.deleteButton.config(state='normal')
         self.saveButton.config(state='disabled')
+
         kasus_id = []
         kasus_id.insert(0, item[0])
 
 
-    def onClear(self):
+    def clear(self):
         self.entryTanggal.delete(0, END)
         self.entryKasus.delete(0, END)
         self.entryUsername.delete(0, END)
+
+    def onClear(self):
+        self.clear()
+        self.updateButton.config(state='disabled')
+        self.deleteButton.config(state='disabled')
+        self.saveButton.config(state='normal')
 
     def onKembali(self):
         root.destroy()

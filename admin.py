@@ -11,9 +11,11 @@ root.iconbitmap("Polinema.ico")
 # config = Config()
 judul_kolom = ("ID", "Nama", "Telepon", "Username", "Password", "Role", "UserDelete", "Status")
 optionlist = ["ADM", "USR"]
+entries_field = []
 
 
 class Admin(Config):
+
     def __init__(self, parent):
         super(Admin, self).__init__()
         self.parent = parent
@@ -107,41 +109,30 @@ class Admin(Config):
         entUsername = self.inputUsername.get()
         entRole = self.value_inside.get()
 
-        entry_list = []
-        entry_list.extend((entNama, entTelepon, entPassword, entKonfirmasi, entUsername, entRole))
+        if not entNama:
+            messagebox.showerror(title="Error", message="Nama harus diisi")
+        elif not entTelepon:
+            messagebox.showerror(title="Error", message="Telepon harus diisi")
+        elif not entPassword:
+            messagebox.showerror(title="Error", message="Password harus diisi")
+        elif not entKonfirmasi:
+            messagebox.showerror(title="Error", message="Konfirmasi harus diisi")
+        elif not entUsername:
+            messagebox.showerror(title="Error", message="Username harus diisi")
+        elif not entRole:
+            messagebox.showerror(title="Error", message="Isikan role Anda")
+        elif entPassword != entKonfirmasi:
+            messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
+        else:
+            try:
+                self.create(entNama, entTelepon, entRole, entUsername, entPassword)
+                self.trvTabel.delete(*self.trvTabel.get_children())
+                self.frame_tabel.after(0, self.table())
+                self.onClear()
+            except mysql.connector.errors.IntegrityError as e:
+                if e.errno == 1452:
+                    messagebox.showerror(title='Error', message='Error database kode 1452')
 
-        for entry in enumerate(entry_list):
-            if not entNama:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entTelepon:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entPassword:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entKonfirmasi:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entUsername:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entRole:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            else:
-                if entPassword != entKonfirmasi:
-                    messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
-                    break
-                else:
-                    try:
-                        self.create(entNama, entTelepon, entRole, entUsername, entPassword)
-                        self.trvTabel.delete(*self.trvTabel.get_children())
-                        self.frame_tabel.after(0, self.table())
-                        self.onClear()
-                    except mysql.connector.errors.IntegrityError:
-                        messagebox.showerror(title='Error', message='Username ' + entUsername + ' sudah ada')
-                    break
     def onDelete(self):
         konfirmasi_hapus = messagebox.askquestion(title='Hapus data', message='Apakah Anda yakin ingin menghapus?', icon='warning')
         if konfirmasi_hapus == 'yes':
@@ -163,38 +154,27 @@ class Admin(Config):
         entUsername = self.inputUsername.get()
         entRole = self.value_inside.get()
 
-        entry_list = []
-        entry_list.extend((entNama, entTelepon, entPassword, entKonfirmasi, entUsername, entRole))
-
-        for entry in enumerate(entry_list):
-            if not entNama:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entTelepon:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entPassword:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entKonfirmasi:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entUsername:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            if not entRole:
-                messagebox.showerror(title="Error", message="Field harus lengkap")
-                break
-            else:
-                if entPassword != entKonfirmasi:
-                    messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
-                    break
-                else:
-                    self.update(entNama, entTelepon, entRole, entUsername, entPassword, entKode)
-                    self.trvTabel.delete(*self.trvTabel.get_children())
-                    self.frame_tabel.after(0, self.table())
-                    self.onClear()
-                    break
+        if not entNama:
+            messagebox.showerror(title="Error", message="Nama harus diisi")
+        elif not entTelepon:
+            messagebox.showerror(title="Error", message="Telepon harus diisi")
+        elif not entPassword:
+            messagebox.showerror(title="Error", message="Password harus diisi")
+        elif not entKonfirmasi:
+            messagebox.showerror(title="Error", message="Konfirmasi harus diisi")
+        elif not entUsername:
+            messagebox.showerror(title="Error", message="Username harus diisi")
+        elif not entRole:
+            messagebox.showerror(title="Error", message="Isikan role Anda")
+        elif entPassword != entKonfirmasi:
+            messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
+        elif entPassword != entKonfirmasi:
+                messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
+        else:
+            self.update(entNama, entTelepon, entRole, entUsername, entPassword, entKode)
+            self.trvTabel.delete(*self.trvTabel.get_children())
+            self.frame_tabel.after(0, self.table())
+            self.onClear()
 
     def onActivateUser(self):
         selected_item = self.trvTabel.selection()[0]
