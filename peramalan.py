@@ -51,7 +51,7 @@ class Peramalan(Config):
         self.inputAkurasi = Entry(self.nilai_frame, state='readonly')
         self.inputAkurasi.grid(column='1', row='3')
 
-        Button(self.button_frame, command=self.GenerateGraph,font='{Segoe UI Semibold} 10 {}', relief='groove', text='Generate Graph', width='20').grid(column='0', padx='10', row='0')
+        Button(self.button_frame, command=self.GenerateGraph,font='{Segoe UI Semibold} 10 {}', relief='groove', text='Prediksi Data', width='20').grid(column='0', padx='10', row='0')
         self.buttonPreVaksin = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Prediksi Pre-Vaksin', width='20', command=self.PreVaksin)
         self.buttonPreVaksin.grid(column='0', row='1', padx='10')
         self.buttonGenerateCSV = Button(self.button_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Generate CSV', width='20', command=self.onGenerateCSV)

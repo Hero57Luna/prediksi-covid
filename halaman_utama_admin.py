@@ -1,5 +1,6 @@
 from tkinter import *
-import os
+from tkinter import messagebox
+import os, glob
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
@@ -9,12 +10,14 @@ root.iconbitmap("Polinema.ico")
 class UtamaAdmin:
     def __init__(self, toplevel):
         self.toplevel = toplevel
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 600
         tinggi = 400
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
         setTengahY = (self.toplevel.winfo_screenheight() - tinggi) // 2
         self.toplevel.geometry("%ix%i+%i+%i" % (lebar, tinggi, setTengahX, setTengahY))
         self.komponen()
+
 
     def komponen(self):
         #frame
@@ -26,7 +29,7 @@ class UtamaAdmin:
         self.button_frame.pack(side='top')
 
         #label
-        self.header_label = Label(self.header_frame, background='#808080', text='Halo! Selamat Datang Admin', font='{Segoe UI Semibold} 14 {}').pack(side='top')
+        self.header_label = Label(self.header_frame, background='#808080', text='Halo admin {}Selamat Datang'.format(self.read_credentials()), font='{Segoe UI Semibold} 14 {}').pack(side='top')
 
         #button
         self.buttonKelola = Button(self.button_frame, text='Kelolah Pengguna', width='30', font='{Segoe UI Semibold} 12 {}', command=self.KelolaPengguna)
@@ -41,6 +44,21 @@ class UtamaAdmin:
     def lihatDataPositif(self):
         root.destroy()
         os.system('halaman_lihat_kasus_positif.py')
+
+    def read_credentials(self):
+        fname = 'credentials.cred'
+        with open(fname) as f:
+            next(f)
+            for line in f:
+                return line
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 UtamaAdmin(root)
 root.mainloop()

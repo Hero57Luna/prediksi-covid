@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from config import Config
-import os
+import os, glob
 import mysql.connector
 
 root = Tk()
@@ -15,10 +15,10 @@ entries_field = []
 
 
 class Admin(Config):
-
     def __init__(self, parent):
         super(Admin, self).__init__()
         self.parent = parent
+        self.parent.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 780
         tinggi = 705
         setTengahX = (self.parent.winfo_screenwidth()-lebar)//2
@@ -246,6 +246,10 @@ class Admin(Config):
         os.system('halaman_utama_admin.py')
 
     def onChangePassword(self):
+        kode = self.inputKode.get()
+        f = open("pass.txt", "w")
+        f.write(kode)
+        f.close()
         root.destroy()
         os.system('halaman_ganti_password.py')
 
@@ -275,6 +279,14 @@ class Admin(Config):
             self.activateUser.config(state='disabled')
         else:
             self.activateUser.config(state='normal')
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 
 Admin(root)

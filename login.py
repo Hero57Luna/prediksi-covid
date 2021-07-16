@@ -1,15 +1,19 @@
 from tkinter import *
 from tkinter import messagebox
 from config import Config
-import os
+import os, glob
+from pathlib import Path
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
 
+
 class Login(Config):
+
     def __init__(self, toplevel):
+        root.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         self.toplevel = toplevel
         super(Login, self).__init__()
         lebar = 350
@@ -65,13 +69,14 @@ class Login(Config):
                 hasil_user = cursor.fetchone()
                 if hasil_user[0] == 'ADM':
                    if str(hasil_user[1]) == 'None':
+                       self.credentials()
                        root.destroy()
                        os.system('halaman_utama_admin.py')
                    else:
                        messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
                 elif hasil_user[0] == 'USR':
                     if str(hasil_user[1]) == 'None':
-                        root.destroy()
+                        root.withdraw()
                         os.system('halaman_utama_user.py')
                     else:
                         messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
@@ -79,6 +84,28 @@ class Login(Config):
                 messagebox.showerror(title='Error', message='Username atau Password Anda salah')
         else:
             messagebox.showerror(title='Error', message='Username atau Password tidak boleh kosong')
+
+    def credentials(self):
+        path = Path('.').absolute() / 'credentials.cred'
+        target = '%r'%str(path)
+        cursor = self._Config__db.cursor()
+        verifikasi_username = self.inputUsername.get()
+        verifikasi_password = self.inputPassword.get()
+        sql = "SELECT 'id' " \
+              "UNION " \
+              "SELECT id_user FROM login WHERE username = '{0}' AND password = {1} " \
+              "INTO OUTFILE {2} " \
+              "FIELDS TERMINATED BY ',' " \
+              "LINES TERMINATED BY '\n'".format(verifikasi_username, verifikasi_password, target)
+        cursor.execute(sql)
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 
 Login(root)

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from config import Config
-import os
+import os, glob
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
@@ -11,6 +11,7 @@ root.iconbitmap("Polinema.ico")
 class GantiPassword(Config):
     def __init__(self, toplevel):
         self.toplevel = toplevel
+
         super(GantiPassword, self).__init__()
         lebar = 400
         tinggi = 350
@@ -37,24 +38,32 @@ class GantiPassword(Config):
         Label(input_frame, background='#cedfe0', text='Konfirmasi', font='{Segoe UI Semibold} 12 {}').grid(
             column='0', row='3', sticky='w')
 
-        self.idEntry = Entry(input_frame)
+        id_user = StringVar()
+        id_user.set(self.readpass())
+        self.idEntry = Entry(input_frame, textvariable=id_user, state='readonly')
         self.idEntry.grid(column='1', row='0', sticky='w', padx='20')
-        self.oldPassword = Entry(input_frame)
+        self.oldPassword = Entry(input_frame, show='•')
         self.oldPassword.grid(column='1', row='1', sticky='w', padx='20')
-        self.newPassword = Entry(input_frame)
+        self.newPassword = Entry(input_frame, show='•')
         self.newPassword.grid(column='1', row='2', sticky='w', padx='20')
-        self.konfirmasi = Entry(input_frame)
+        self.konfirmasi = Entry(input_frame, show='•')
         self.konfirmasi.grid(column='1', row='3', sticky='w', padx='20')
 
         self.saveButton = Button(button_frame, font='{Segoe UI Semibold} 10 {}', text='Simpan', command=self.gantiPassword)
         self.saveButton.grid(column='0', row='0', padx='5')
-        self.kembaliButton = Button(button_frame, font='{Segoe UI Semibold} 10 {}', text='Kembali', command=self.onKembali)
+        self.kembaliButton = Button(button_frame, font='{Segoe UI Semibold} 10 {}', text='Kembali', command=self.delete_pass)
         self.kembaliButton.grid(column='1', row='0')
 
 
     def onKembali(self):
         root.destroy()
         os.system('admin.py')
+
+    def readpass(self):
+        fname = 'pass.txt'
+        with open(fname) as f:
+            for line in f:
+                return line
 
     def gantiPassword(self):
         cursor = self._Config__db.cursor()
@@ -95,6 +104,7 @@ class GantiPassword(Config):
                 elif result_id:
                     if result_password[0] == getOldPassword:
                         self.changePassword(getNewPassword, getID)
+                        self.delete_pass()
                     else:
                         messagebox.showerror(title='Error', message='User dengan password tersebut tidak terdaftar')
                     break
@@ -102,6 +112,13 @@ class GantiPassword(Config):
                     messagebox.showerror(title='Error', message='User tidak terdaftar')
                     break
 
+    def delete_pass(self):
+        fname = 'pass.txt'
+        filelist = glob.glob(fname)
+        for f in filelist:
+            os.remove(f)
+        root.destroy()
+        os.system('admin.py')
 
 
 GantiPassword(root)
