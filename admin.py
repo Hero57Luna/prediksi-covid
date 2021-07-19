@@ -19,7 +19,7 @@ class Admin(Config):
         super(Admin, self).__init__()
         self.parent = parent
         self.parent.protocol("WM_DELETE_WINDOW", self.delete_credentials)
-        lebar = 780
+        lebar = 800
         tinggi = 705
         setTengahX = (self.parent.winfo_screenwidth()-lebar)//2
         setTengahY = (self.parent.winfo_screenheight()-tinggi)//2
@@ -87,6 +87,8 @@ class Admin(Config):
         self.clearButton.grid(column='4', row='0', sticky='w', padx='10')
         self.searchButton = Button(self.frame_button, font='{Segoe UI Semibold} 9 {}', relief='groove', text='Cari', command=self.onSearch)
         self.searchButton.grid(column='6', row='0', sticky='e')
+        self.resetButton = Button(self.frame_button, font='{Segoe UI Semibold} 9 {}', relief='groove', text='Reset', command=self.reset, state='disabled')
+        self.resetButton.grid(column='7', row='0', sticky='e')
         self.backButton = Button(self.frame_menu, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Kembali', width='8', command=self.onKembali)
         self.backButton.grid(column='0', row='0', padx='10')
         self.changePassword = Button(input_frame, font='{Segoe UI Semibold} 10 {}', relief='groove', text='Ganti Password', state='disabled', command=self.onChangePassword)
@@ -186,6 +188,7 @@ class Admin(Config):
     def onSearch(self):
         searchIndex = self.searchEntry.get()
         if len(searchIndex) > 0:
+            self.resetButton.config(state='normal')
             self.searchEntry.delete(0, END)
             for record in self.trvTabel.get_children():
                 self.trvTabel.delete(record)
@@ -195,7 +198,7 @@ class Admin(Config):
             for data in result:
                 self.trvTabel.insert('', 'end', values=data)
         else:
-           pass
+            pass
 
     def table(self):
         for kolom in judul_kolom:
@@ -209,7 +212,7 @@ class Admin(Config):
         self.trvTabel.column("Username", width=150, stretch=NO)
         self.trvTabel.column("Role", anchor=CENTER, width=96, stretch=NO)
         self.trvTabel.column("UserDelete", width=100, stretch=NO)
-        self.trvTabel.column("Status", width=100, stretch=NO)
+        self.trvTabel.column("Status", width=120, stretch=NO)
 
         user_result = self.read_user()
         i=0
@@ -279,6 +282,12 @@ class Admin(Config):
             self.activateUser.config(state='disabled')
         else:
             self.activateUser.config(state='normal')
+
+    def reset(self):
+        for record in self.trvTabel.get_children():
+            self.trvTabel.delete(record)
+        self.table()
+        self.resetButton.config(state='disabled')
 
     def delete_credentials(self):
         dir = os.getcwd()

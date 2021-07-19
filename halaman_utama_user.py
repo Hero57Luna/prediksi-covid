@@ -1,5 +1,5 @@
 from tkinter import *
-import os
+import os, glob
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
@@ -9,6 +9,7 @@ root.iconbitmap("Polinema.ico")
 class UtamaUser:
     def __init__(self, toplevel):
         self.toplevel = toplevel
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 600
         tinggi = 500
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
@@ -49,6 +50,21 @@ class UtamaUser:
     def prediksiKasus(self):
         root.destroy()
         os.system('peramalan.py')
+
+    def read_credentials(self):
+        fname = 'credentials.cred'
+        with open(fname) as f:
+            next(f)
+            for line in f:
+                return line
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 UtamaUser(root)
 root.mainloop()

@@ -29,7 +29,7 @@ class UtamaAdmin:
         self.button_frame.pack(side='top')
 
         #label
-        self.header_label = Label(self.header_frame, background='#808080', text='Halo admin {}Selamat Datang'.format(self.read_credentials()), font='{Segoe UI Semibold} 14 {}').pack(side='top')
+        self.header_label = Label(self.header_frame, background='#808080', text='Halo Admin {}\nSelamat Datang'.format(self.read_credentials()), font='{Segoe UI Semibold} 14 {}').pack(side='top')
 
         #button
         self.buttonKelola = Button(self.button_frame, text='Kelolah Pengguna', width='30', font='{Segoe UI Semibold} 12 {}', command=self.KelolaPengguna)
@@ -50,7 +50,9 @@ class UtamaAdmin:
         with open(fname) as f:
             next(f)
             for line in f:
-                return line
+                hasil = line.split(',')
+                return hasil[0]
+
 
     def delete_credentials(self):
         dir = os.getcwd()

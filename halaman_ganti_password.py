@@ -78,7 +78,7 @@ class GantiPassword(Config):
         result_id = cursor.fetchone()
 
         #get password from login
-        select_password = "SELECT password FROM login WHERE id_user = '{}'".format(getID)
+        select_password = "SELECT sandi FROM login WHERE id_user = '{}'".format(getID)
         cursor.execute(select_password)
         result_password = cursor.fetchone()
 

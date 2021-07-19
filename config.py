@@ -59,7 +59,7 @@ class Config(object):
         results = cursor.execute("BEGIN;"
                        "INSERT INTO user (nama, telepon, role) "
                        "VALUES('{}', '{}', '{}');"
-                       "INSERT INTO login (id_user, username, password) "
+                       "INSERT INTO login (id_user, username, sandi) "
                        "VALUES(LAST_INSERT_ID(), '{}', '{}');"
                        .format(nama, telepon, role, username, password), multi=True)
         for cur in results:
@@ -94,7 +94,7 @@ class Config(object):
     def read_user(self):
         cur = self.__db.cursor()
         cur.execute("SELECT user.id, user.nama, user.telepon, login.username, "
-                    "login.password, user.role, user.user_delete,"
+                    "login.sandi, user.role, user.user_delete,"
                     "CASE WHEN user.user_delete IS NULL THEN 'User Aktif'"
                     "ELSE 'User Tidak Aktif'"
                     "END AS StatusKaryawan "
@@ -133,14 +133,14 @@ class Config(object):
     # below are the search queries, it has the same sql as read but has the where clause
     def search_kasus(self, index):
         cur = self.__db.cursor()
-        sql = "SELECT datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id WHERE Tanggal LIKE '%{0}%' OR nama LIKE '%{0}%'".format(index)
+        sql = "SELECT datareal.Tanggal, datareal.Kasus, datareal.username, user.nama FROM datareal INNER JOIN user ON datareal.username=user.id WHERE Tanggal LIKE '%{0}%' OR nama LIKE '%{0}%' GROUP BY Tanggal ASC".format(index)
         cur.execute(sql)
         search_kasus = cur.fetchall()
         return search_kasus
 
     def search_user(self, index):
         cur = self.__db.cursor()
-        sql = "SELECT user.id, user.nama, user.telepon, login.username, login.password, user.role, user.user_delete, " \
+        sql = "SELECT user.id, user.nama, user.telepon, login.username, login.sandi, user.role, user.user_delete, " \
               "CASE WHEN user.user_delete IS NULL THEN 'User Aktif' ELSE 'User Tidak Aktif' " \
               "END AS StatusKaryawan " \
               "FROM user INNER JOIN login ON user.id=login.id_user " \
@@ -160,7 +160,7 @@ class Config(object):
         val = (nama, telepon, role, username, password, id)
         sql = "BEGIN;" \
               "UPDATE user SET nama = '{0}', telepon = '{1}', role= '{2}' WHERE id = {3};" \
-              "UPDATE login SET username = '{4}', password = '{5}' WHERE id_user = {3};".format(nama, telepon, role, id, username, password)
+              "UPDATE login SET username = '{4}', sandi = '{5}' WHERE id_user = {3};".format(nama, telepon, role, id, username, password)
         results = cursor.execute(sql, multi=True)
         for cur in results:
             if cur.with_rows:
@@ -266,7 +266,7 @@ class Config(object):
     # this function is used to change password on the kelola pengguna
     def changePassword(self, password, id):
         cursor = self.__db.cursor()
-        sql = "UPDATE login SET password = '{}' WHERE id_user = {}".format(password, id)
+        sql = "UPDATE login SET sandi = '{}' WHERE id_user = {}".format(password, id)
         cursor.execute(sql)
         self.__db.commit()
 

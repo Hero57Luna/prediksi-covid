@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from config import Config
-import os
+import os, glob
 import mysql.connector
 
 root = Tk()
@@ -15,6 +15,7 @@ class LihatPositif(Config):
     def __init__(self, toplevel):
         super(LihatPositif, self).__init__()
         self.toplevel = toplevel
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 500
         tinggi = 600
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
@@ -125,9 +126,30 @@ class LihatPositif(Config):
         self.table()
         self.resetButton.config(state='disabled')
 
+    def read_credentials(self):
+        fname = 'credentials.cred'
+        with open(fname) as f:
+            next(f)
+            for line in f:
+                hasil = line.split(',')
+                return hasil[1]
+
     def onKembali(self):
-        root.destroy()
-        os.system('halaman_utama_user.py')
+        role = self.read_credentials()
+        if role == 'ADM':
+            root.destroy()
+            os.system('halaman_utama_admin.py')
+        else:
+            root.destroy()
+            os.system('halaman_utama_user.py')
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 
 LihatPositif(root)

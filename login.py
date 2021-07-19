@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from config import Config
-import os, glob
+import os, glob, subprocess
 from pathlib import Path
 
 root = Tk()
@@ -60,11 +60,12 @@ class Login(Config):
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
         if len(verifikasi_username or verifikasi_password) > 0:
-            sql = "SELECT id_user FROM login WHERE username = '{}' AND password = '{}'".format(verifikasi_username, verifikasi_password)
+            val = (verifikasi_username, verifikasi_password)
+            sql = "SELECT id_user FROM login WHERE sandi = '{0}' AND username = '{1}'".format(verifikasi_password, verifikasi_username)
             cursor.execute(sql)
             results = cursor.fetchone()
             if results:
-                user_query = "SELECT role, user_delete FROM user WHERE id = {}".format(results[0])
+                user_query = "SELECT role, user_delete FROM user WHERE id = '{}'".format(results[0])
                 cursor.execute(user_query)
                 hasil_user = cursor.fetchone()
                 if hasil_user[0] == 'ADM':
@@ -76,7 +77,8 @@ class Login(Config):
                        messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
                 elif hasil_user[0] == 'USR':
                     if str(hasil_user[1]) == 'None':
-                        root.withdraw()
+                        self.credentials()
+                        root.destroy()
                         os.system('halaman_utama_user.py')
                     else:
                         messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
@@ -91,13 +93,16 @@ class Login(Config):
         cursor = self._Config__db.cursor()
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
-        sql = "SELECT 'id' " \
+        sql = "SELECT 'id_user', 'role', 'id' " \
               "UNION " \
-              "SELECT id_user FROM login WHERE username = '{0}' AND password = {1} " \
+              "SELECT login.id_user, user.role, login.id FROM login " \
+              "INNER JOIN user ON login.id_user=user.id " \
+              "WHERE username = '{0}' AND sandi = '{1}' " \
               "INTO OUTFILE {2} " \
               "FIELDS TERMINATED BY ',' " \
-              "LINES TERMINATED BY '\n'".format(verifikasi_username, verifikasi_password, target)
+              r"LINES TERMINATED BY '\n'".format(verifikasi_username, verifikasi_password, target)
         cursor.execute(sql)
+        #subprocess.check_call(['attrib', '+H', 'credentials.cred'])
 
     def delete_credentials(self):
         dir = os.getcwd()
