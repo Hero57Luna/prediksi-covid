@@ -6,7 +6,9 @@ in Kota Probolinggo, Indonesia based on the data provided in the sisfo-covid dat
 1. XAMPP
 2. Python (make sure to put python in PATH)
 3. PyCharm (makes your life easier)
+
 Once you've done then import the database
+
 Run the login.py first
 # Contact
 Please contact me if you want to use my project.
