@@ -4,6 +4,7 @@ from tkinter import messagebox
 from matplotlib import pyplot as plt
 import numpy as np
 import os
+import glob
 from config import Config
 
 root = Tk()
@@ -16,6 +17,7 @@ class Peramalan(Config):
     def __init__(self, toplevel):
         super(Peramalan, self).__init__()
         self.toplevel = toplevel
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 600
         tinggi = 500
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
@@ -68,7 +70,7 @@ class Peramalan(Config):
     def onGenerateCSV(self):
        self.GenerateAllData()
 
-    def forecasting(self, namafile):
+    def forecasting(self, namafile, ramalan, aktual):
         try:
             np.set_printoptions(precision=3, suppress=True)
             cwd = os.getcwd()
@@ -92,6 +94,7 @@ class Peramalan(Config):
 
             final = np.array(hasil)
             kasus_to_array = np.array(kasus)
+            print(final)
 
 
             #hitung mean error
@@ -137,21 +140,29 @@ class Peramalan(Config):
             self.inputPrediksi.config(state='readonly')
             self.inputAkurasi.config(state='readonly')
 
-            plt.plot(tanggal, final, label='Ramalan')
-            plt.plot(tanggal, kasus, label='Aktual')
+            plt.plot(tanggal, final, label='{}'.format(ramalan))
+            plt.plot(tanggal, kasus, label='{}'.format(aktual))
             plt.legend()
             plt.show()
         except FileNotFoundError:
             messagebox.showerror(title='Error', message='File data tidak ditemukan')
 
     def GenerateGraph(self):
-        self.forecasting('Positif')
+        self.forecasting(namafile='Positif', ramalan='Ramalan', aktual='Aktual')
 
     def PreVaksin(self):
-        self.forecasting('DataPreVaksin')
+        self.forecasting('DataPreVaksin', ramalan='Ramalan Pre Vaksin', aktual='Pre Vaksin Aktual')
 
     def PascaVaksin(self):
-        self.forecasting('DataPascaVaksin')
+        self.forecasting('DataPascaVaksin', ramalan='Ramalan Pasca Vaksin', aktual='Pasca Vaksin Aktual')
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 Peramalan(root)
 root.mainloop()

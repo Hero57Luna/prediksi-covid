@@ -26,7 +26,7 @@ class UtamaUser:
         self.button_frame = Frame(self.top_level, background='#cedfe0', pady='10')
         self.button_frame.pack(side='top')
 
-        self.header_label = Label(self.header_frame, background='#808080', text='Halo! Selamat Datang User',
+        self.header_label = Label(self.header_frame, background='#808080', text='Halo User {}\n Selamat Datang'.format(self.read_credentials()),
                                   font='{Segoe UI Semibold} 14 {}').pack(side='top')
 
         self.buttonLihatKasus = Button(self.button_frame, text='Lihat Data Kasus Positif', width='30',
@@ -56,7 +56,8 @@ class UtamaUser:
         with open(fname) as f:
             next(f)
             for line in f:
-                return line
+                hasil = line.split(',')
+                return hasil[0]
 
     def delete_credentials(self):
         dir = os.getcwd()

@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk, messagebox
 import mysql.connector
 import os
+import glob
 from config import Config
 import datetime
 
@@ -16,6 +17,7 @@ class InputPositif(Config):
     def __init__(self, toplevel):
         super(InputPositif, self).__init__()
         self.toplevel = toplevel
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 500
         tinggi = 550
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
@@ -108,7 +110,7 @@ class InputPositif(Config):
                     except ValueError:
                         messagebox.showerror(title='Error', message='Mohon cek kembali format tanggal dan kasus')
                 else:
-                    messagebox.showerror(title='Error',message='Kasus tidak boleh kosong')
+                    messagebox.showerror(title='Error',message='ID tidak boleh kosong')
             else:
                 messagebox.showerror(title='Error', message='Tanggal tidak boleh kosong')
         else:
@@ -208,6 +210,14 @@ class InputPositif(Config):
     def onKembali(self):
         root.destroy()
         os.system('halaman_utama_user.py')
+
+    def delete_credentials(self):
+        dir = os.getcwd()
+        target = dir + '\credentials.cred'
+        filelist = glob.glob(target)
+        for f in filelist:
+            os.remove(f)
+        root.quit()
 
 InputPositif(root)
 root.mainloop()

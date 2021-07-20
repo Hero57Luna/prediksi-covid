@@ -102,7 +102,7 @@ class Login(Config):
               "FIELDS TERMINATED BY ',' " \
               r"LINES TERMINATED BY '\n'".format(verifikasi_username, verifikasi_password, target)
         cursor.execute(sql)
-        #subprocess.check_call(['attrib', '+H', 'credentials.cred'])
+        subprocess.check_call(['attrib', '+H', 'credentials.cred'])
 
     def delete_credentials(self):
         dir = os.getcwd()
