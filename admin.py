@@ -121,7 +121,7 @@ class Admin(Config):
             messagebox.showerror(title="Error", message="Konfirmasi harus diisi")
         elif not entUsername:
             messagebox.showerror(title="Error", message="Username harus diisi")
-        elif not entRole:
+        elif entRole == "Pilih role Anda":
             messagebox.showerror(title="Error", message="Isikan role Anda")
         elif entPassword != entKonfirmasi:
             messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
@@ -132,8 +132,8 @@ class Admin(Config):
                 self.frame_tabel.after(0, self.table())
                 self.onClear()
             except mysql.connector.errors.IntegrityError as e:
-                if e.errno == 1452:
-                    messagebox.showerror(title='Error', message='Error database kode 1452')
+                if e.errno == 1062:
+                    messagebox.showerror(title='Error', message='Username sudah ada')
 
     def onDelete(self):
         konfirmasi_hapus = messagebox.askquestion(title='Hapus data', message='Apakah Anda yakin ingin menghapus?', icon='warning')
