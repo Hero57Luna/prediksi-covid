@@ -18,7 +18,7 @@ class Admin(Config):
     def __init__(self, parent):
         super(Admin, self).__init__()
         self.parent = parent
-        self.parent.protocol("WM_DELETE_WINDOW", self.delete_credentials)
+        # self.parent.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 800
         tinggi = 705
         setTengahX = (self.parent.winfo_screenwidth()-lebar)//2
@@ -173,7 +173,7 @@ class Admin(Config):
         elif entPassword != entKonfirmasi:
                 messagebox.showerror(title="Error", message="Konfirmasi Password Tidak Sama")
         else:
-            self.update(entNama, entTelepon, entRole, entUsername, entPassword, entKode)
+            self.update(entNama, entUsername, entPassword, entTelepon, entRole, entKode)
             self.trvTabel.delete(*self.trvTabel.get_children())
             self.frame_tabel.after(0, self.table())
             self.onClear()

@@ -73,21 +73,18 @@ class GantiPassword(Config):
         getKonfirmasi = self.konfirmasi.get()
 
         #get id user inside login table
-        select_id = "SELECT * FROM login WHERE id_user = '{}'".format(getID)
-        cursor.execute(select_id)
-        result_id = cursor.fetchone()
+        # select_id = "SELECT * FROM login WHERE id_user = '{}'".format(getID)
+        # cursor.execute(select_id)
+        # result_id = cursor.fetchone()
 
         #get password from login
-        select_password = "SELECT sandi FROM login WHERE id_user = '{}'".format(getID)
+        select_password = "SELECT password FROM user WHERE id = '{}'".format(getID)
         cursor.execute(select_password)
         result_password = cursor.fetchone()
 
-        entry_list = [getID, getOldPassword, getNewPassword, getKonfirmasi]
+        entry_list = [getOldPassword, getNewPassword, getKonfirmasi]
 
         for entry in enumerate(entry_list):
-            if not getID:
-                messagebox.showerror(title='Error', message='Field harus lengkap')
-                break
             if not getOldPassword:
                 messagebox.showerror(title='Error', message='Field harus lengkap')
                 break
@@ -101,7 +98,7 @@ class GantiPassword(Config):
                 if getNewPassword != getKonfirmasi:
                     messagebox.showerror(title='Error', message='Password dengan konfirmasi tidak sama')
                     break
-                elif result_id:
+                elif select_password:
                     if result_password[0] == getOldPassword:
                         self.changePassword(getNewPassword, getID)
                         self.delete_pass()

@@ -13,7 +13,7 @@ root.iconbitmap("Polinema.ico")
 class Login(Config):
 
     def __init__(self, toplevel):
-        root.protocol("WM_DELETE_WINDOW", self.delete_credentials)
+        # root.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         self.toplevel = toplevel
         super(Login, self).__init__()
         lebar = 350
@@ -60,30 +60,47 @@ class Login(Config):
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
         if len(verifikasi_username or verifikasi_password) > 0:
-            val = (verifikasi_username, verifikasi_password)
-            sql = "SELECT id_user FROM login WHERE sandi = '{0}' AND username = '{1}'".format(verifikasi_password, verifikasi_username)
+            sql = "SELECT id, username, level, user_delete FROM user WHERE username = '{0}' AND password = '{1}'".format(verifikasi_username, verifikasi_password)
             cursor.execute(sql)
             results = cursor.fetchone()
             if results:
-                user_query = "SELECT role, user_delete FROM user WHERE id = '{}'".format(results[0])
-                cursor.execute(user_query)
-                hasil_user = cursor.fetchone()
-                if hasil_user[0] == 'ADM':
-                   if str(hasil_user[1]) == 'None':
-                       self.credentials()
-                       root.destroy()
-                       os.system('halaman_utama_admin.py')
-                   else:
-                       messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
-                elif hasil_user[0] == 'USR':
-                    if str(hasil_user[1]) == 'None':
+                if str(results[3]) == 'None':
+                    if results[2] == 'ADM':
+                        self.credentials()
+                        root.destroy()
+                        os.system('halaman_utama_admin.py')
+                    elif results[2] == 'USR':
                         self.credentials()
                         root.destroy()
                         os.system('halaman_utama_user.py')
-                    else:
-                        messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
+                else:
+                    messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, hubungi Admin untuk lebih lanjut')
             else:
-                messagebox.showerror(title='Error', message='Username atau Password Anda salah')
+                messagebox.showerror(title='Error', message='Pengguna ini tidak ditemukan')
+            # val = (verifikasi_username, verifikasi_password)
+            # sql = "SELECT id_user FROM login WHERE sandi = '{0}' AND username = '{1}'".format(verifikasi_password, verifikasi_username)
+            # cursor.execute(sql)
+            # results = cursor.fetchone()
+            # if results:
+            #     user_query = "SELECT role, user_delete FROM user WHERE id = '{}'".format(results[0])
+            #     cursor.execute(user_query)
+            #     hasil_user = cursor.fetchone()
+            #     if hasil_user[0] == 'ADM':
+            #        if str(hasil_user[1]) == 'None':
+            #            self.credentials()
+            #            root.destroy()
+            #            os.system('halaman_utama_admin.py')
+            #        else:
+            #            messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
+            #     elif hasil_user[0] == 'USR':
+            #         if str(hasil_user[1]) == 'None':
+            #             self.credentials()
+            #             root.destroy()
+            #             os.system('halaman_utama_user.py')
+            #         else:
+            #             messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
+            # else:
+            #     messagebox.showerror(title='Error', message='Username atau Password Anda salah')
         else:
             messagebox.showerror(title='Error', message='Username atau Password tidak boleh kosong')
 
@@ -93,11 +110,9 @@ class Login(Config):
         cursor = self._Config__db.cursor()
         verifikasi_username = self.inputUsername.get()
         verifikasi_password = self.inputPassword.get()
-        sql = "SELECT 'id_user', 'role', 'id' " \
-              "UNION " \
-              "SELECT login.id_user, user.role, login.id FROM login " \
-              "INNER JOIN user ON login.id_user=user.id " \
-              "WHERE username = '{0}' AND sandi = '{1}' " \
+        sql = "SELECT id, level, nama " \
+              "FROM user " \
+              "WHERE username = '{0}' AND password = '{1}' " \
               "INTO OUTFILE {2} " \
               "FIELDS TERMINATED BY ',' " \
               r"LINES TERMINATED BY '\n'".format(verifikasi_username, verifikasi_password, target)
