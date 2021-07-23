@@ -13,7 +13,7 @@ root.iconbitmap("Polinema.ico")
 class Login(Config):
 
     def __init__(self, toplevel):
-        # root.protocol("WM_DELETE_WINDOW", self.delete_credentials)
+        root.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         self.toplevel = toplevel
         super(Login, self).__init__()
         lebar = 350
