@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 19, 2021 at 11:07 AM
+-- Generation Time: Jul 23, 2021 at 04:49 PM
 -- Server version: 10.1.40-MariaDB
 -- PHP Version: 7.3.5
 
@@ -26,10 +26,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `datareal`
+-- Table structure for table `datakasus`
 --
 
-CREATE TABLE `datareal` (
+CREATE TABLE `datakasus` (
   `id` int(11) NOT NULL,
   `Tanggal` date NOT NULL,
   `Kasus` int(11) NOT NULL,
@@ -37,10 +37,10 @@ CREATE TABLE `datareal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `datareal`
+-- Dumping data for table `datakasus`
 --
 
-INSERT INTO `datareal` (`id`, `Tanggal`, `Kasus`, `username`) VALUES
+INSERT INTO `datakasus` (`id`, `Tanggal`, `Kasus`, `username`) VALUES
 (1, '2020-04-07', 2, 58),
 (2, '2020-04-13', 1, 36),
 (3, '2020-04-17', 2, 36),
@@ -319,46 +319,29 @@ INSERT INTO `datareal` (`id`, `Tanggal`, `Kasus`, `username`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `login`
+-- Table structure for table `dataramalan`
 --
 
-CREATE TABLE `login` (
-  `id` int(10) NOT NULL,
-  `id_user` int(10) NOT NULL,
-  `username` varchar(30) NOT NULL,
-  `sandi` varchar(30) NOT NULL
+CREATE TABLE `dataramalan` (
+  `id` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `tanggal` datetime NOT NULL,
+  `prediksibesok` int(11) NOT NULL,
+  `mae` int(11) NOT NULL,
+  `mape` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `login`
+-- Dumping data for table `dataramalan`
 --
 
-INSERT INTO `login` (`id`, `id_user`, `username`, `sandi`) VALUES
-(20, 36, 'rahadian22', 'rahadian'),
-(22, 56, 'dhela20', '1234'),
-(23, 57, 'yullymartha', 'yully72'),
-(24, 58, 'bhima', 'bima123'),
-(25, 59, 'aditya23', 'adit88'),
-(26, 61, 'adi88', '1234');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `role`
---
-
-CREATE TABLE `role` (
-  `id` varchar(3) NOT NULL,
-  `deskripsi` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `role`
---
-
-INSERT INTO `role` (`id`, `deskripsi`) VALUES
-('ADM', 'admin dapat melakukan crud user dan lihat data'),
-('USR', 'user dapat melakukan input kasus positif, melakukan prediksi, dan melihat data kasus positif');
+INSERT INTO `dataramalan` (`id`, `id_user`, `tanggal`, `prediksibesok`, `mae`, `mape`) VALUES
+(5, 57, '2021-07-21 00:00:00', 1, 0, 6),
+(6, 57, '2021-07-21 00:00:00', 7, 6, 6),
+(7, 57, '2021-07-21 00:00:00', 1, 1, 6),
+(8, 57, '2021-07-21 00:00:00', 1, 1, 6),
+(9, 36, '2021-07-21 00:00:00', 1, 0, 6),
+(10, 36, '2021-07-21 00:00:00', 1, 0, 6);
 
 -- --------------------------------------------------------
 
@@ -369,8 +352,10 @@ INSERT INTO `role` (`id`, `deskripsi`) VALUES
 CREATE TABLE `user` (
   `id` int(10) NOT NULL,
   `nama` varchar(60) NOT NULL,
+  `username` varchar(30) NOT NULL,
+  `password` varchar(20) NOT NULL,
   `telepon` varchar(12) NOT NULL,
-  `role` varchar(3) NOT NULL,
+  `level` enum('ADM','USR') NOT NULL,
   `user_delete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -378,91 +363,75 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `nama`, `telepon`, `role`, `user_delete`) VALUES
-(36, 'Rahadian Bagaskara Adikusuma', '082230842350', 'ADM', NULL),
-(56, 'Dhelanda La Nina', '081234567', 'ADM', NULL),
-(57, 'Dyah Yully Marthawati', '085233438735', 'USR', NULL),
-(58, 'Agastya Bima Kumala', '081322567899', 'ADM', NULL),
-(59, 'Aditya Wahyu', '081345617890', 'USR', '2021-07-12 17:05:46'),
-(60, 'Rahadian', '0811212', 'ADM', '2021-07-12 03:07:06'),
-(61, 'Adikusuma', '081234', 'ADM', '2021-07-15 10:28:36');
+INSERT INTO `user` (`id`, `nama`, `username`, `password`, `telepon`, `level`, `user_delete`) VALUES
+(36, 'Adikusuma Bagaskara Rahadian', 'rahadian22', 'rahadian', '082230842350', 'ADM', NULL),
+(57, 'Dyah Yully Marthawati', 'yullymartha', 'yully72', '085233438735', 'USR', NULL),
+(58, 'Agastya Bima Kumala', 'bhima', 'bhima123', '081322567899', 'ADM', NULL),
+(63, 'Rahadian Bagas', 'bagasss', 'ADM', '081221', 'ADM', NULL);
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `datareal`
+-- Indexes for table `datakasus`
 --
-ALTER TABLE `datareal`
+ALTER TABLE `datakasus`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `Tanggal` (`Tanggal`),
   ADD KEY `username` (`username`);
 
 --
--- Indexes for table `login`
+-- Indexes for table `dataramalan`
 --
-ALTER TABLE `login`
+ALTER TABLE `dataramalan`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `id_user` (`id_user`);
-
---
--- Indexes for table `role`
---
-ALTER TABLE `role`
-  ADD PRIMARY KEY (`id`);
+  ADD KEY `dataramalan_ibfk_1` (`id_user`);
 
 --
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `role` (`role`);
+  ADD UNIQUE KEY `username` (`username`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `datareal`
+-- AUTO_INCREMENT for table `datakasus`
 --
-ALTER TABLE `datareal`
+ALTER TABLE `datakasus`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=275;
 
 --
--- AUTO_INCREMENT for table `login`
+-- AUTO_INCREMENT for table `dataramalan`
 --
-ALTER TABLE `login`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+ALTER TABLE `dataramalan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `datareal`
+-- Constraints for table `datakasus`
 --
-ALTER TABLE `datareal`
-  ADD CONSTRAINT `datareal_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`id`);
+ALTER TABLE `datakasus`
+  ADD CONSTRAINT `datakasus_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`id`);
 
 --
--- Constraints for table `login`
+-- Constraints for table `dataramalan`
 --
-ALTER TABLE `login`
-  ADD CONSTRAINT `login_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `user`
---
-ALTER TABLE `user`
-  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`role`) REFERENCES `role` (`id`);
+ALTER TABLE `dataramalan`
+  ADD CONSTRAINT `dataramalan_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id`);
 SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
