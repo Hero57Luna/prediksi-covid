@@ -129,7 +129,6 @@ class LihatPositif(Config):
     def read_credentials(self):
         fname = 'credentials.cred'
         with open(fname) as f:
-            next(f)
             for line in f:
                 hasil = line.split(',')
                 return hasil[1]

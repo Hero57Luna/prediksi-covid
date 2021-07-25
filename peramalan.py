@@ -17,7 +17,7 @@ class Peramalan(Config):
     def __init__(self, toplevel):
         super(Peramalan, self).__init__()
         self.toplevel = toplevel
-        #self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 620
         tinggi = 700
         setTengahX = (self.toplevel.winfo_screenwidth() - lebar) // 2
@@ -84,20 +84,24 @@ class Peramalan(Config):
                 return hasil[0]
 
     def onSave(self):
-        credentials = self.read_credentials()
-        cwd = os.getcwd()
-        target_file = '\exported\Positif.csv'
-        target_dir = cwd + target_file
-        df = pd.read_csv(target_dir, parse_dates=True)
-        tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y').dt.date
-        besok = pd.DatetimeIndex(tanggal) + pd.DateOffset(1)
-        esok = besok[-1]
-        MAE = self.inputError.get()
-        MAPE = self.inputAkurasi.get()
-        prediksi = self.inputPrediksi.get()
-        self.insertRamalan(iduser=credentials, tanggal=esok, prediksi=prediksi, mae=MAE, mape=MAPE)
-        self.trvTabel.delete(*self.trvTabel.get_children())
-        self.tabel_frame.after(0, self.table())
+        try:
+            credentials = self.read_credentials()
+            cwd = os.getcwd()
+            target_file = '\exported\Positif.csv'
+            target_dir = cwd + target_file
+            df = pd.read_csv(target_dir, parse_dates=True)
+            tanggal = pd.to_datetime(df['Tanggal'], format='%d-%b-%Y').dt.date
+            besok = pd.DatetimeIndex(tanggal) + pd.DateOffset(1)
+            esok = besok[-1]
+            MAE = self.inputError.get()
+            MAPE = self.inputAkurasi.get()
+            prediksi = self.inputPrediksi.get()
+            self.insertRamalan(iduser=credentials, tanggal=esok, prediksi=prediksi, mae=MAE, mape=MAPE)
+            self.trvTabel.delete(*self.trvTabel.get_children())
+            self.tabel_frame.after(0, self.table())
+        except FileNotFoundError as e:
+            if e.errno == 2:
+                messagebox.showerror(title='Error', message='Credentials tidak ditemukan, harap login untuk menyimpan data')
 
 
     def onKembali(self):
@@ -131,7 +135,6 @@ class Peramalan(Config):
 
             final = np.array(hasil)
             kasus_to_array = np.array(kasus)
-            print(final)
 
 
             #hitung mean error
@@ -181,9 +184,6 @@ class Peramalan(Config):
             plt.plot(tanggal, kasus, label='{}'.format(aktual))
             plt.legend()
             plt.show()
-            global besok
-            besok = pd.DatetimeIndex(tanggal) + pd.DateOffset(1)
-            print(besok)
         except FileNotFoundError:
             messagebox.showerror(title='Error', message='File data tidak ditemukan')
 

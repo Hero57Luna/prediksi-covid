@@ -1,14 +1,15 @@
 from tkinter import *
 from tkinter import messagebox
 from config import Config
-import os, glob, subprocess
+import os
+import glob
+import subprocess
 from pathlib import Path
 
 root = Tk()
 root.title("Prediksi Covid v.1.0")
 root.resizable(0, 0)
 root.iconbitmap("Polinema.ico")
-
 
 class Login(Config):
 
@@ -52,9 +53,6 @@ class Login(Config):
         self.loginButton = Button(button_frame, font='{Segoe UI Semibold} 11 {}', text='Login', width='33', command=self.proses_login)
         self.loginButton.grid(column='0', row='4')
 
-    def login_gagal(self):
-        pass
-
     def proses_login(self):
         cursor = self._Config__db.cursor()
         verifikasi_username = self.inputUsername.get()
@@ -77,30 +75,6 @@ class Login(Config):
                     messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, hubungi Admin untuk lebih lanjut')
             else:
                 messagebox.showerror(title='Error', message='Pengguna ini tidak ditemukan')
-            # val = (verifikasi_username, verifikasi_password)
-            # sql = "SELECT id_user FROM login WHERE sandi = '{0}' AND username = '{1}'".format(verifikasi_password, verifikasi_username)
-            # cursor.execute(sql)
-            # results = cursor.fetchone()
-            # if results:
-            #     user_query = "SELECT role, user_delete FROM user WHERE id = '{}'".format(results[0])
-            #     cursor.execute(user_query)
-            #     hasil_user = cursor.fetchone()
-            #     if hasil_user[0] == 'ADM':
-            #        if str(hasil_user[1]) == 'None':
-            #            self.credentials()
-            #            root.destroy()
-            #            os.system('halaman_utama_admin.py')
-            #        else:
-            #            messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
-            #     elif hasil_user[0] == 'USR':
-            #         if str(hasil_user[1]) == 'None':
-            #             self.credentials()
-            #             root.destroy()
-            #             os.system('halaman_utama_user.py')
-            #         else:
-            #             messagebox.showerror(title='Error', message='Pengguna ini tidak lagi aktif, kontak admin untuk informasi lebih lanjut')
-            # else:
-            #     messagebox.showerror(title='Error', message='Username atau Password Anda salah')
         else:
             messagebox.showerror(title='Error', message='Username atau Password tidak boleh kosong')
 

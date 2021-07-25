@@ -11,7 +11,7 @@ root.iconbitmap("Polinema.ico")
 class GantiPassword(Config):
     def __init__(self, toplevel):
         self.toplevel = toplevel
-
+        self.toplevel.protocol("WM_DELETE_WINDOW", self.delete_pass)
         super(GantiPassword, self).__init__()
         lebar = 400
         tinggi = 350

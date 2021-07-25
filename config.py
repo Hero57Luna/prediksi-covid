@@ -267,7 +267,6 @@ class Config(object):
             self.GenerateCSVDataPreVaksin()
             self.GenerateCSVDataKasus()
             self.GenerateCSVDataPascaVaksin()
-            self.GenerateCSVSmadaKraksaan()
         except mysql.connector.errors.DatabaseError:
             peringatan = messagebox.askquestion(title='Warning', message='File sudah ada, apakah Anda ingin hapus?')
             if peringatan == 'yes':

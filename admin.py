@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from config import Config
-import os, glob
+import os
+import glob
+import subprocess
 import mysql.connector
 
 root = Tk()
@@ -18,7 +20,7 @@ class Admin(Config):
     def __init__(self, parent):
         super(Admin, self).__init__()
         self.parent = parent
-        # self.parent.protocol("WM_DELETE_WINDOW", self.delete_credentials)
+        self.parent.protocol("WM_DELETE_WINDOW", self.delete_credentials)
         lebar = 800
         tinggi = 705
         setTengahX = (self.parent.winfo_screenwidth()-lebar)//2
@@ -252,6 +254,7 @@ class Admin(Config):
         kode = self.inputKode.get()
         f = open("pass.txt", "w")
         f.write(kode)
+        subprocess.check_call(['attrib', '+H', 'pass.txt'])
         f.close()
         root.destroy()
         os.system('halaman_ganti_password.py')
